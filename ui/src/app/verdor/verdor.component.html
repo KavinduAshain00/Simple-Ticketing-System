@@ -1,0 +1,38 @@
+<div class="ticket-form">
+  <h2>Add Ticket</h2>
+  <form [formGroup]="vendor" (ngSubmit)="addTicket()">
+    <div class="form-group">
+      <label for="ticketType">Ticket Type</label>
+      <input
+        id="ticketType"
+        type="text"
+        formControlName="ticketType"
+        required
+      />
+      <div *ngIf="vendor.get('ticketType')?.invalid && vendor.get('ticketType')?.touched">
+        <p class="error">Ticket type is required.</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="quantity">Quantity</label>
+      <input
+        id="quantity"
+        type="number"
+        formControlName="quantity"
+        min="1"
+        [max]="availableTickets"
+        required
+      />
+      <div *ngIf="vendor.get('quantity')?.invalid && vendor.get('quantity')?.touched">
+        <p class="error">Quantity must be at least 1 and not exceed available tickets.</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <p>Available Tickets: {{ availableTickets }}</p>
+    </div>
+
+    <button type="submit" [disabled]="vendor.invalid">Add Ticket</button>
+  </form>
+</div>

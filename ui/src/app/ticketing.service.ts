@@ -1,16 +1,33 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketingService {
-  private apiUrl = 'http://localhost:8080/config';  // Replace with your backend endpoint
+  // Assume availableTickets is being tracked via a BehaviorSubject
+  private availableTicketsSubject = new BehaviorSubject<number>(100); // Starting with 100 tickets
+  availableTickets$ = this.availableTicketsSubject.asObservable();  // Observable for subscribers
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
-  saveConfig(config: any): Observable<any> {
-    return this.http.post(this.apiUrl, config);
+  // Method to add tickets
+  addTickets(quantity: number) {
+    if (quantity > 0) {
+      const currentTickets = this.availableTicketsSubject.value;
+      this.availableTicketsSubject.next(currentTickets + quantity); // Update available tickets
+    } else {
+      console.error('Cannot add 0 or negative tickets');
+    }
+  }
+
+  // Method to subtract tickets (e.g., for purchasing)
+  subtractTickets(quantity: number) {
+    const currentTickets = this.availableTicketsSubject.value;
+    if (currentTickets >= quantity) {
+      this.availableTicketsSubject.next(currentTickets - quantity); // Update available tickets
+    } else {
+      console.error('Not enough tickets available.');
+    }
   }
 }
