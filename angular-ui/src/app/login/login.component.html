@@ -1,0 +1,46 @@
+<div class="tabs">
+  <button (click)="switchTab('customer')" [class.active]="activeTab === 'customer'">Customer</button>
+  <button (click)="switchTab('admin')" [class.active]="activeTab === 'admin'">Admin</button>
+</div>
+
+<div *ngIf="activeTab === 'customer'">
+  <!-- Toggle between Login and Sign Up -->
+  <div class="toggle-buttons">
+    <button (click)="toggleSignUp()" [class.active]="!isSignUp">Login</button>
+    <button (click)="toggleSignUp()" [class.active]="isSignUp">Sign Up</button>
+  </div>
+
+  <!-- Customer Login Form -->
+  <form *ngIf="!isSignUp" [formGroup]="customerForm" (ngSubmit)="onSubmitCustomer()">
+    <label for="customer-username">Username</label>
+    <input id="customer-username" formControlName="username" type="text" />
+
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- Customer Sign Up Form -->
+  <form *ngIf="isSignUp" [formGroup]="signUpForm" (ngSubmit)="onSubmitSignUp()">
+    <label for="sign-up-username">Username</label>
+    <input id="sign-up-username" formControlName="username" type="text" />
+
+    <label for="sign-up-email">Email</label>
+    <input id="sign-up-email" formControlName="email" type="email" />
+
+    <label for="vip">VIP</label>
+    <input id="vip" formControlName="isVIP" type="checkbox" />
+
+    <button type="submit">Sign Up</button>
+  </form>
+</div>
+
+<div *ngIf="activeTab === 'admin'">
+  <form [formGroup]="adminForm" (ngSubmit)="onSubmitAdmin()">
+    <label for="admin-username">Username</label>
+    <input id="admin-username" formControlName="username" type="text" />
+
+    <label for="password">Password</label>
+    <input id="password" formControlName="password" type="password" />
+
+    <button type="submit">Login</button>
+  </form>
+</div>

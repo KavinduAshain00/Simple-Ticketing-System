@@ -1,0 +1,171 @@
+/* General Body Styling */
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: #f5f7fa;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tabs Section */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.tabs button {
+  background-color: #e4e7ed;
+  border: none;
+  padding: 12px 25px;
+  margin: 0 8px;
+  border-radius: 50px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.tabs button.active {
+  background-color: #007bff;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  font-weight: bold;
+}
+
+.tabs button:hover:not(.active) {
+  background-color: #d3d9e1;
+}
+
+/* Toggle Buttons Section */
+.toggle-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.toggle-buttons button {
+  background-color: #e4e7ed;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.3s ease-in-out;
+}
+
+.toggle-buttons button.active {
+  background-color: #007bff;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0, 123, 255, 0.3);
+}
+
+.toggle-buttons button:hover:not(.active) {
+  background-color: #d3d9e1;
+}
+
+/* Form Styling */
+form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="checkbox"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+form input[type="text"]:focus,
+form input[type="email"]:focus,
+form input[type="password"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+form input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+}
+
+form button {
+  width: 100%;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+form button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+/* Responsive Styling */
+@media (max-width: 480px) {
+  .tabs button,
+  .toggle-buttons button {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  form {
+    width: calc(100% - 40px);
+    padding: 15px;
+  }
+
+  form button {
+    padding: 12px;
+  }
+}
+
+/* Style the label */
+label[for="vip"] {
+  font-size: 1.2em;
+  color: #333;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* Style the checkbox */
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* Add hover effect on the label */
+label[for="vip"]:hover {
+  color: #007BFF;
+}
+
+/* Add some spacing between the checkbox and label */
+input[type="checkbox"] + label {
+  margin-left: 5px;
+}

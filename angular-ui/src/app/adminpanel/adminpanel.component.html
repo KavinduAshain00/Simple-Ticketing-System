@@ -1,0 +1,19 @@
+<div class="admin-panel">
+  <h1>Ticket Sales Overview</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Sold</th>
+        <th>Available</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ticket of tickets">
+        <td>{{ ticket.type }}</td>
+        <td>{{ ticket.sold }}</td>
+        <td>{{ ticket.available }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -18,7 +18,7 @@ export class ApiService {
   purchaseTicketWithCustomer(purchaseData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/tickets/purchaseWithCustomer`, purchaseData);
   }
-  
 
+  
   // Other API methods can remain here
 }

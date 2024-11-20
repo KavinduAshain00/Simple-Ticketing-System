@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 
 @Component({
@@ -11,5 +11,13 @@ import { NavbarComponent } from './navbar/navbar.component';
   imports: [CommonModule, RouterModule, NavbarComponent]  // Import necessary modules like RouterModule
 })
 export class AppComponent {
-  title = 'angular-ui';
+  title = 'Ticketing System';
+
+  isLoginPage: boolean = false;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe(() => {
+      this.isLoginPage = this.router.url === '/login';
+    });
+  }
 }
