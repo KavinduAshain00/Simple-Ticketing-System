@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { ApiService } from '../api.service'; // Service for API calls
@@ -55,15 +55,71 @@ export class LoginComponent {
     this.isSignUp = false; // Reset to login view when switching tabs
     this.isVendorSignUp = false;  // Reset vendor sign-up when switching tabs
 
-    // Clear all form fields and validations when switching tabs
+    this.resetForms();
+
     if (tab === 'customer') {
-      this.customerForm.reset();
+      this.addCustomerValidators();
     } else if (tab === 'admin') {
-      this.adminForm.reset();
+      this.addAdminValidators();
     } else if (tab === 'vendor') {
-      this.vendorForm.reset();
-      this.vendorSignUpForm.reset();
+      this.addVendorValidators();
     }
+  }
+  
+  // Add validators for customer form
+  addCustomerValidators() {
+    this.customerForm.get('email')?.setValidators([Validators.required, Validators.email]);
+    this.customerForm.get('email')?.updateValueAndValidity();
+  }
+  
+  // Add validators for admin form
+  addAdminValidators() {
+    this.adminForm.get('username')?.setValidators([Validators.required]);
+    this.adminForm.get('password')?.setValidators([Validators.required]);
+    this.adminForm.get('username')?.updateValueAndValidity();
+    this.adminForm.get('password')?.updateValueAndValidity();
+  }
+  
+  // Add validators for vendor form
+  addVendorValidators() {
+    this.vendorForm.get('email')?.setValidators([Validators.required, Validators.email]);
+    this.vendorForm.get('email')?.updateValueAndValidity();
+  }
+
+  addVendorSignupValidators() {
+    this.vendorSignUpForm.get('name')?.setValidators([Validators.required, Validators.email]);
+    this.vendorSignUpForm.get('email')?.setValidators([Validators.required, Validators.email]);
+    this.vendorSignUpForm.get('name')?.updateValueAndValidity();
+    this.vendorSignUpForm.get('email')?.updateValueAndValidity();
+  }
+
+  addSignUpValidators(){
+    this.signUpForm.get('name')?.setValidators([Validators.required]); // Name is required
+  this.signUpForm.get('email')?.setValidators([Validators.required, Validators.email]); // Email is required and must be valid
+  this.signUpForm.get('vip')?.setValidators([]); // No specific validators for vip
+  this.signUpForm.get('name')?.updateValueAndValidity();
+  this.signUpForm.get('email')?.updateValueAndValidity();
+  this.signUpForm.get('vip')?.updateValueAndValidity();
+  }
+  
+  // Reset all forms to clear validators and values
+  resetForms() {
+    this.customerForm.reset();
+    this.adminForm.reset();
+    this.signUpForm.reset();
+    this.vendorForm.reset();
+    this.vendorSignUpForm.reset();
+  
+    // Clear validators for all forms
+    this.customerForm.get('email')?.clearValidators();
+    this.adminForm.get('username')?.clearValidators();
+    this.adminForm.get('password')?.clearValidators();
+    this.vendorForm.get('email')?.clearValidators();
+    this.vendorSignUpForm.get('name')?.clearValidators();
+    this.vendorSignUpForm.get('email')?.clearValidators();
+    this.signUpForm.get('name')?.clearValidators();
+    this.signUpForm.get('email')?.clearValidators();
+    this.signUpForm.get('vip')?.clearValidators();
   }
 
   // Toggle between customer login and sign-up
@@ -72,6 +128,7 @@ export class LoginComponent {
 
     if (this.isSignUp) {
       this.signUpForm.reset(); // Reset signup form when toggling
+      this.addSignUpValidators();
     }
   }
 
@@ -81,13 +138,30 @@ export class LoginComponent {
 
     if (this.isVendorSignUp) {
       this.vendorSignUpForm.reset(); // Reset vendor signup form when toggling
+      this.addVendorSignupValidators();
     }
   }
 
   // Handle vendor login
   onSubmitVendor() {
-    // Vendor login logic here
-    console.log('Vendor login data:', this.vendorForm.value);
+    if (this.vendorForm.valid) {
+      const email = this.vendorForm.value.email;
+
+      this.apiService.getCustomerByEmail(email).subscribe({
+        next: (response) => {
+          console.log('Logged in successfully:', response);
+          alert(`Welcome back, ${response.name || 'Customer'}!`);
+          localStorage.setItem('customer', JSON.stringify(response));
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          console.error('Login error:', err);
+          alert('Login failed. Please check your email and try again.');
+        }
+      });
+    } else {
+      alert('Please enter a valid email.');
+    }
   }
 
   // Handle customer login
@@ -144,6 +218,21 @@ export class LoginComponent {
 
   // Handle vendor sign-up
   onSubmitVendorSignUp() {
-
+    if (this.vendorSignUpForm.valid) {
+      const vendorData = this.vendorSignUpForm.value; // Ensure this includes name, email, and isVip
+      this.apiService.createCustomer(vendorData).subscribe({
+        next: (response) => {
+          console.log('Vendor signed up successfully:', response);
+          alert('Sign up successful!');
+          this.signUpForm.reset();
+        },
+        error: (err) => {
+          console.error('Sign Up error:', err);
+          alert('Failed to sign up. Please try again.');
+        }
+      });
+    } else {
+      alert('Please fill in all required fields.');
+    }
   }
 }

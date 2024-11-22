@@ -28,7 +28,7 @@ public class CustomerController {
         return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/get-by-email/{email}")
     public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
         Optional<Customer> customer = customerService.getCustomerByEmail(email);
         return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

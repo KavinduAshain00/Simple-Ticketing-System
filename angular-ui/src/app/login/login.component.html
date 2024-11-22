@@ -1,6 +1,7 @@
+<div><h1>Ticketing System</h1>
 <div class="tabs">
-  <button (click)="switchTab('customer')" [class.active]="activeTab === 'customer'">Customer</button>
   <button (click)="switchTab('admin')" [class.active]="activeTab === 'admin'">Admin</button>
+  <button (click)="switchTab('customer')" [class.active]="activeTab === 'customer'">Customer</button>
   <button (click)="switchTab('vendor')" [class.active]="activeTab === 'vendor'">Vendor</button>
 </div>
 
@@ -25,9 +26,13 @@
 
     <label for="sign-up-email">Email</label>
     <input id="sign-up-email" formControlName="email" type="email" />
+    
 
-    <label for="vip">VIP</label>
-    <input id="vip" formControlName="vip" type="checkbox" />
+    <div class="vip-checkbox">
+      <label for="vip">VIP</label>
+      <input id="vip" formControlName="vip" type="checkbox" />
+    </div>
+    
 
     <button type="submit">Sign Up</button>
   </form>

@@ -23,6 +23,7 @@ body {
   color: #333;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  width: 150px;
 }
 
 .tabs button.active {
@@ -53,6 +54,7 @@ body {
   cursor: pointer;
   color: #555;
   transition: all 0.3s ease-in-out;
+  width: 100px;
 }
 
 .toggle-buttons button.active {
@@ -86,7 +88,7 @@ form input[type="text"],
 form input[type="email"],
 form input[type="password"],
 form input[type="checkbox"] {
-  width: 100%;
+  width: 93%;
   padding: 12px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
@@ -154,8 +156,6 @@ label[for="vip"] {
 
 /* Style the checkbox */
 input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
   cursor: pointer;
   margin-right: 10px;
 }
@@ -169,3 +169,14 @@ label[for="vip"]:hover {
 input[type="checkbox"] + label {
   margin-left: 5px;
 }
+
+h1{
+  text-align: center;
+  margin-bottom: 50px;
+  font-size: 48px;
+}
+
+.vip-checkbox{
+  display: flex;
+}
+

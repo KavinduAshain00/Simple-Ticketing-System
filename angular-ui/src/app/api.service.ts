@@ -32,7 +32,7 @@ export class ApiService {
   }
 
   getCustomerByEmail(email: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/customers/${email}`);
+    return this.http.get(`${this.baseUrl}/customers/get-by-email/${email}`);
   }
 
   // Update a customer
