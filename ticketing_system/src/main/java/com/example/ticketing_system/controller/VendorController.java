@@ -27,6 +27,12 @@ public class VendorController {
         return vendor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/get-by-email/{email}")
+    public ResponseEntity<Vendor> getVendorByEmail(@PathVariable String email) {
+        Optional<Vendor> vendor = vendorService.getVendorByEmail(email);
+        return vendor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{vendorId}")
     public ResponseEntity<Void> deleteVendor(@PathVariable Long vendorId) {
         vendorService.deleteVendor(vendorId);

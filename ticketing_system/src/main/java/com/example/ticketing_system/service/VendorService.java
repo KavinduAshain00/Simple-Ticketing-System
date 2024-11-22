@@ -19,7 +19,15 @@ public class VendorService {
     }
 
     public Optional<Vendor> getVendorById(Long vendorId) {
-        return vendorRepository.findById(vendorId);
+        Optional<Vendor> vendor = vendorRepository.findById(vendorId);
+        if(vendor.isEmpty()){
+            throw new RuntimeException("Vendor not found with ID: " + vendorId);
+        }
+        return vendor;
+    }
+
+    public Optional<Vendor> getVendorByEmail(String email) {
+        return vendorRepository.findByEmail(email); // Ensure the repository has this method
     }
 
     public void deleteVendor(Long vendorId) {

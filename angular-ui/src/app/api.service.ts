@@ -55,5 +55,9 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/vendors/create`, vendor);
   }
 
+  getVendorByEmail(email: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/vendors/get-by-email/${email}`);
+  }
+
   // Other API methods can remain here
 }

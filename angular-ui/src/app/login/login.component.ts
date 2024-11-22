@@ -39,7 +39,7 @@ export class LoginComponent {
     });
 
     this.vendorForm = this.fb.group({
-      name: [''],
+      email: [''],
     });
 
     this.vendorSignUpForm = this.fb.group({
@@ -86,7 +86,7 @@ export class LoginComponent {
   }
 
   addVendorSignupValidators() {
-    this.vendorSignUpForm.get('name')?.setValidators([Validators.required, Validators.email]);
+    this.vendorSignUpForm.get('name')?.setValidators([Validators.required]);
     this.vendorSignUpForm.get('email')?.setValidators([Validators.required, Validators.email]);
     this.vendorSignUpForm.get('name')?.updateValueAndValidity();
     this.vendorSignUpForm.get('email')?.updateValueAndValidity();
@@ -146,11 +146,11 @@ export class LoginComponent {
     if (this.vendorForm.valid) {
       const email = this.vendorForm.value.email;
 
-      this.apiService.getCustomerByEmail(email).subscribe({
+      this.apiService.getVendorByEmail(email).subscribe({
         next: (response) => {
           console.log('Logged in successfully:', response);
-          alert(`Welcome back, ${response.name || 'Customer'}!`);
-          localStorage.setItem('customer', JSON.stringify(response));
+          alert(`Welcome back, ${response.name || 'Vendor'}!`);
+          localStorage.setItem('vendor', JSON.stringify(response));
           this.router.navigate(['/home']);
         },
         error: (err) => {
