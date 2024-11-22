@@ -1,6 +1,7 @@
 <div class="tabs">
   <button (click)="switchTab('customer')" [class.active]="activeTab === 'customer'">Customer</button>
   <button (click)="switchTab('admin')" [class.active]="activeTab === 'admin'">Admin</button>
+  <button (click)="switchTab('vendor')" [class.active]="activeTab === 'vendor'">Vendor</button>
 </div>
 
 <div *ngIf="activeTab === 'customer'">
@@ -14,7 +15,6 @@
   <form *ngIf="!isSignUp" [formGroup]="customerForm" (ngSubmit)="onSubmitCustomer()">
     <label for="customer-username">Email</label>
     <input id="customer-username" formControlName="email" type="text" />
-
     <button type="submit">Login</button>
   </form>
 
@@ -42,5 +42,34 @@
     <input id="password" formControlName="password" type="password" />
 
     <button type="submit">Login</button>
+  </form>
+</div>
+
+<div *ngIf="activeTab === 'vendor'">
+  <!-- Toggle between Vendor Login and Sign Up -->
+  <div class="toggle-buttons">
+    <button (click)="toggleVendorSignUp()" [class.active]="!isVendorSignUp">Login</button>
+    <button (click)="toggleVendorSignUp()" [class.active]="isVendorSignUp">Sign Up</button>
+  </div>
+
+  <!-- Vendor Login Form -->
+  <form *ngIf="!isVendorSignUp" [formGroup]="vendorForm" (ngSubmit)="onSubmitVendor()">
+    <label for="vendor-username">Email</label>
+    <input id="vendor-username" formControlName="email" type="text" />
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- Vendor Sign Up Form -->
+  <form *ngIf="isVendorSignUp" [formGroup]="vendorSignUpForm" (ngSubmit)="onSubmitVendorSignUp()">
+    <label for="vendor-sign-up-username">Username</label>
+    <input id="vendor-sign-up-username" formControlName="name" type="text" />
+
+    <label for="vendor-sign-up-email">Email</label>
+    <input id="vendor-sign-up-email" formControlName="email" type="email" />
+
+    <label for="vendor-code">Vendor Code</label>
+    <input id="vendor-code" formControlName="vendorCode" type="text" />
+
+    <button type="submit">Sign Up</button>
   </form>
 </div>
