@@ -44,8 +44,7 @@ export class LoginComponent {
 
     this.vendorSignUpForm = this.fb.group({
       name: [''],
-      email: [''],
-      vendorCode: ['']
+      email: ['']
     });
   }
 
@@ -65,13 +64,13 @@ export class LoginComponent {
       this.addVendorValidators();
     }
   }
-  
+
   // Add validators for customer form
   addCustomerValidators() {
     this.customerForm.get('email')?.setValidators([Validators.required, Validators.email]);
     this.customerForm.get('email')?.updateValueAndValidity();
   }
-  
+
   // Add validators for admin form
   addAdminValidators() {
     this.adminForm.get('username')?.setValidators([Validators.required]);
@@ -79,7 +78,7 @@ export class LoginComponent {
     this.adminForm.get('username')?.updateValueAndValidity();
     this.adminForm.get('password')?.updateValueAndValidity();
   }
-  
+
   // Add validators for vendor form
   addVendorValidators() {
     this.vendorForm.get('email')?.setValidators([Validators.required, Validators.email]);
@@ -101,7 +100,7 @@ export class LoginComponent {
   this.signUpForm.get('email')?.updateValueAndValidity();
   this.signUpForm.get('vip')?.updateValueAndValidity();
   }
-  
+
   // Reset all forms to clear validators and values
   resetForms() {
     this.customerForm.reset();
@@ -109,7 +108,7 @@ export class LoginComponent {
     this.signUpForm.reset();
     this.vendorForm.reset();
     this.vendorSignUpForm.reset();
-  
+
     // Clear validators for all forms
     this.customerForm.get('email')?.clearValidators();
     this.adminForm.get('username')?.clearValidators();
@@ -219,20 +218,21 @@ export class LoginComponent {
   // Handle vendor sign-up
   onSubmitVendorSignUp() {
     if (this.vendorSignUpForm.valid) {
-      const vendorData = this.vendorSignUpForm.value; // Ensure this includes name, email, and isVip
-      this.apiService.createCustomer(vendorData).subscribe({
+      const vendorData = this.vendorSignUpForm.value;
+
+      this.apiService.createVendor(vendorData).subscribe({
         next: (response) => {
           console.log('Vendor signed up successfully:', response);
-          alert('Sign up successful!');
-          this.signUpForm.reset();
+          alert('Vendor sign-up successful!');
+          this.vendorSignUpForm.reset(); // Reset the form after successful sign-up
         },
         error: (err) => {
-          console.error('Sign Up error:', err);
-          alert('Failed to sign up. Please try again.');
-        }
+          console.error('Vendor sign-up error:', err);
+          alert('Vendor sign-up failed. Please try again.');
+        },
       });
     } else {
-      alert('Please fill in all required fields.');
+      alert('Please fill in all required fields.blah');
     }
   }
 }

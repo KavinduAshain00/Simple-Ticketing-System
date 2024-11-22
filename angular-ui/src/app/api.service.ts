@@ -51,5 +51,9 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/customers`, { params });
   }
 
+  createVendor(vendor: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/vendors/create`, vendor);
+  }
+
   // Other API methods can remain here
 }
