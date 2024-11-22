@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
+import { ApiService } from '../api.service'; // Service for API calls
 
 @Component({
   standalone: true,
@@ -18,44 +19,92 @@ export class LoginComponent {
   adminForm: FormGroup;
   signUpForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private apiService: ApiService) {
     this.customerForm = this.fb.group({
-      username: [''],
+      email: [''] // Only email for login
     });
 
     this.adminForm = this.fb.group({
       username: [''],
-      password: [''],
+      password: [''] // Admin login requires both username and password
     });
 
     this.signUpForm = this.fb.group({
-      username: [''],
-      email: [''],
-      isVIP: [false],
+      name: [''],
+      email: [''], // Only username and email for sign-up
+      vip: [false]
     });
   }
 
   switchTab(tab: 'customer' | 'admin') {
     this.activeTab = tab;
     this.isSignUp = false; // Reset to login view when switching tabs
+
+    // Clear all form fields and validations when switching tabs
+    if (tab === 'customer') {
+      this.customerForm.reset();
+    } else if (tab === 'admin') {
+      this.adminForm.reset();
+    }
   }
 
   toggleSignUp() {
     this.isSignUp = !this.isSignUp;
+
+    if (this.isSignUp) {
+      this.signUpForm.reset(); // Reset signup form when toggling
+    }
   }
 
   onSubmitCustomer() {
-    console.log('Customer Form Data:', this.customerForm.value);
-    this.router.navigate(['/home']);
+    if (this.customerForm.valid) {
+      const email = this.customerForm.value.email;
+
+      this.apiService.getCustomerByEmail(email).subscribe({
+        next: (response) => {
+          console.log('Logged in successfully:', response);
+          alert(`Welcome back, ${response.name || 'Customer'}!`);
+          localStorage.setItem('customer', JSON.stringify(response));
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          console.error('Login error:', err);
+          alert('Login failed. Please check your email and try again.');
+        }
+      });
+    } else {
+      alert('Please enter a valid email.');
+    }
   }
 
+
   onSubmitAdmin() {
-    console.log('Admin Form Data:', this.adminForm.value);
-    this.router.navigate(['/admin']);
+    if (this.adminForm.valid) {
+      console.log('Admin Form Data:', this.adminForm.value);
+      this.router.navigate(['/admin']);
+    } else {
+      alert('Please fill in all fields.');
+    }
   }
 
   onSubmitSignUp() {
-    console.log('Sign Up Form Data:', this.signUpForm.value);
-    this.router.navigate(["/login"]);
+    if (this.signUpForm.valid) {
+      const customerData = this.signUpForm.value; // Ensure this includes name, email, and isVip
+      this.apiService.createCustomer(customerData).subscribe({
+        next: (response) => {
+          console.log('Customer signed up successfully:', response);
+          alert('Sign up successful!');
+          this.signUpForm.reset();
+          console.log(this.signUpForm.value);
+        },
+        error: (err) => {
+          console.error('Sign Up error:', err);
+          alert('Failed to sign up. Please try again.');
+        }
+      });
+    } else {
+      alert('Please fill in all required fields.');
+    }
   }
+
 }

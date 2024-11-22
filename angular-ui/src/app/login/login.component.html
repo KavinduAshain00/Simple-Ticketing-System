@@ -12,8 +12,8 @@
 
   <!-- Customer Login Form -->
   <form *ngIf="!isSignUp" [formGroup]="customerForm" (ngSubmit)="onSubmitCustomer()">
-    <label for="customer-username">Username</label>
-    <input id="customer-username" formControlName="username" type="text" />
+    <label for="customer-username">Email</label>
+    <input id="customer-username" formControlName="email" type="text" />
 
     <button type="submit">Login</button>
   </form>
@@ -21,13 +21,13 @@
   <!-- Customer Sign Up Form -->
   <form *ngIf="isSignUp" [formGroup]="signUpForm" (ngSubmit)="onSubmitSignUp()">
     <label for="sign-up-username">Username</label>
-    <input id="sign-up-username" formControlName="username" type="text" />
+    <input id="sign-up-username" formControlName="name" type="text" />
 
     <label for="sign-up-email">Email</label>
     <input id="sign-up-email" formControlName="email" type="email" />
 
     <label for="vip">VIP</label>
-    <input id="vip" formControlName="isVIP" type="checkbox" />
+    <input id="vip" formControlName="vip" type="checkbox" />
 
     <button type="submit">Sign Up</button>
   </form>

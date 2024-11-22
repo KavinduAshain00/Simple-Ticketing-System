@@ -12,23 +12,33 @@ public class Customer {
     private Long id;
 
     private String name;
-    private boolean isVip;
+    private String email;
+    private boolean vip;
 
-    
-    public boolean isVip() {
-        return isVip;
-    }
-    public void setVip(boolean isVip) {
-        this.isVip = isVip;
-    }
+    // Getters and setters
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
-    
 
-    // Getters, setters, and constructor(s)
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean getVip() {
+        return vip;
+    }
+
+    public void setVip(boolean vip) {
+        this.vip = vip;
+    }
 }
+
 

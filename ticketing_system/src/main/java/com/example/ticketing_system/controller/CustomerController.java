@@ -18,6 +18,7 @@ public class CustomerController {
 
     @PostMapping("/create")
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        System.out.println("Received customer: " + customer);
         return ResponseEntity.ok(customerService.createCustomer(customer));
     }
 
@@ -27,10 +28,26 @@ public class CustomerController {
         return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{email}")
+    public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
+        Optional<Customer> customer = customerService.getCustomerByEmail(email);
+        return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{customerId}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable Long customerId,
+            @RequestBody Customer updatedCustomer) {
+        try {
+            Customer customer = customerService.updateCustomer(customerId, updatedCustomer);
+            return ResponseEntity.ok(customer);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{customerId}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long customerId) {
         customerService.deleteCustomer(customerId);
         return ResponseEntity.noContent().build();
     }
 }
-
