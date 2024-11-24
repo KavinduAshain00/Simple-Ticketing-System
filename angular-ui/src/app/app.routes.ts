@@ -10,6 +10,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'admin', component: AdminpanelComponent },
   { path: 'home', component: HomeComponent },
-  { path: 'vendor', component: VendorComponent }, // Ensure correct path
+  { path: 'vendor', component: VendorComponent },
   { path: 'ticket', component: TicketingComponent },
 ];

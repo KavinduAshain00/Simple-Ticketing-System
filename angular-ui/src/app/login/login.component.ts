@@ -151,7 +151,7 @@ export class LoginComponent {
           console.log('Logged in successfully:', response);
           alert(`Welcome back, ${response.name || 'Vendor'}!`);
           localStorage.setItem('vendor', JSON.stringify(response));
-          this.router.navigate(['/home']);
+          this.router.navigate(['/vendor']);
         },
         error: (err) => {
           console.error('Login error:', err);
