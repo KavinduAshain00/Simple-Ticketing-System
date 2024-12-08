@@ -1,0 +1,16 @@
+<form (ngSubmit)="saveConfig()">
+    <mat-form-field>
+      <input matInput placeholder="Total Tickets" [(ngModel)]="config.totalTickets" name="totalTickets" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Max Pool Size" [(ngModel)]="config.maxPoolSize" name="maxPoolSize" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Vendor Release Time (ms)" [(ngModel)]="config.vendorReleaseTime" name="vendorReleaseTime" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Customer Buy Time (ms)" [(ngModel)]="config.customerBuyTime" name="customerBuyTime" />
+    </mat-form-field>
+    <button mat-raised-button type="submit">Save Configuration</button>
+  </form>
+  

@@ -1,0 +1,15 @@
+<mat-card>
+    <h2>Ticket Pool Simulation</h2>
+    <p>Pool Size: {{ poolSize }}</p>
+    <p>Remaining Tickets: {{ remainingTickets }}</p>
+  
+    <button mat-raised-button color="primary" (click)="startSimulation()" [disabled]="isSimulationRunning">
+      Start Simulation
+    </button>
+  
+    <mat-list>
+      <h3>Logs</h3>
+      <mat-list-item *ngFor="let log of logs">{{ log }}</mat-list-item>
+    </mat-list>
+  </mat-card>
+  
