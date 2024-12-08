@@ -60,7 +60,7 @@ export class SimulationComponent implements OnInit {
       totalTickets: 20, // Adjust as needed
       maxPoolSize: 10,
       vendorReleaseTime: 1000,
-      customerBuyTime: 8000,
+      customerBuyTime: 2000,
     };
   
     this.isSimulationRunning = true;
