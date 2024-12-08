@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
-import { AppComponent } from '../src/app/app.component';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import { SimulationComponent } from './app/simulation/simulation.component';
 
-bootstrapApplication(AppComponent, {
-  providers: [provideHttpClient()],
+bootstrapApplication(SimulationComponent, {
+  providers: [provideHttpClient(withFetch())],
 }).catch((err) => console.error(err));

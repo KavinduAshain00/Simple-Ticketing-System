@@ -1,41 +1,24 @@
 package com.example.ticketing_system.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.ticketing_system.config.RealTimeUpdateHandler;
 
 @RestController
 @RequestMapping("/api/updates")
 public class RealTimeUpdateController {
 
-    private final List<SseEmitter> emitters = new ArrayList<>();
+    private final RealTimeUpdateHandler updateHandler;
 
-    @GetMapping("/stream")
-    public SseEmitter streamEvents() {
-        SseEmitter emitter = new SseEmitter(0L); // No timeout
-        emitters.add(emitter);
-
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
-        return emitter;
+    public RealTimeUpdateController(RealTimeUpdateHandler updateHandler) {
+        this.updateHandler = updateHandler;
     }
 
-    public void sendUpdate(String message) {
-        List<SseEmitter> deadEmitters = new ArrayList<>();
-
-        for (SseEmitter emitter : emitters) {
-            try {
-                emitter.send(SseEmitter.event().data(message));
-            } catch (IOException e) {
-                deadEmitters.add(emitter);
-            }
-        }
-
-        emitters.removeAll(deadEmitters);
+    @PostMapping("/send-update")
+    public void sendUpdate(@RequestBody String message) {
+        updateHandler.sendUpdate(message);
     }
 }
-

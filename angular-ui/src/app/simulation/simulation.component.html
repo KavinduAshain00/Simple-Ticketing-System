@@ -9,7 +9,7 @@
   
     <mat-list>
       <h3>Logs</h3>
-      <mat-list-item *ngFor="let log of logs">{{ log }}</mat-list-item>
+      <mat-list-item *ngFor="let log of logs.slice().reverse()">{{ log }}</mat-list-item>
     </mat-list>
   </mat-card>
   
