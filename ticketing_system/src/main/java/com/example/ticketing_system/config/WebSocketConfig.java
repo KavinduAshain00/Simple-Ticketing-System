@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:4200"); // Your Angular frontend origin
+        config.addAllowedOrigin("http://localhost:4200"); // Angular frontend origin
         config.addAllowedMethod("*"); // Allow all HTTP methods
         config.addAllowedHeader("*"); // Allow all headers
         source.registerCorsConfiguration("/**", config);

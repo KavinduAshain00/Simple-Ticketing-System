@@ -1,15 +1,74 @@
-<mat-card>
-    <h2>Ticket Pool Simulation</h2>
-    <p>Pool Size: {{ poolSize }}</p>
-    <p>Remaining Tickets: {{ remainingTickets }}</p>
-  
-    <button mat-raised-button color="primary" (click)="startSimulation()" [disabled]="isSimulationRunning">
-      Start Simulation
-    </button>
-  
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h3 class="m-0">Ticket Pool Simulation</h3>
+      <button class="btn btn-secondary" (click)="openConfiguration()">Configuration</button>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h5>Pool Size:</h5>
+          <p class="display-5 text-primary">{{ poolSize }}</p>
+        </div>
+        <div class="col-md-6">
+          <h5>Remaining Tickets:</h5>
+          <p class="display-5 text-success">{{ remainingTickets }}</p>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-success btn-lg" [disabled]="isSimulationRunning" (click)="startSimulation()">
+          Start Simulation
+        </button>
+        <button class="btn btn-danger btn-lg" [disabled]="!isSimulationRunning" (click)="stopSimulation()">
+          Stop Simulation
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Logs Section -->
+   <br><br>
+  <div class="mt-5">
     <mat-list>
       <h3>Logs</h3>
-      <mat-list-item *ngFor="let log of logs.slice().reverse()">{{ log }}</mat-list-item>
+      <mat-list-item *ngFor="let log of logs.slice().reverse()">
+        {{ log }}
+      </mat-list-item>
     </mat-list>
-  </mat-card>
-  
+  </div>
+</div>
+
+<!-- Configuration Modal -->
+<div class="modal-backdrop" *ngIf="isConfigurationModalOpen">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Simulation Configuration</h5>
+        <button type="button" class="btn-close" (click)="closeConfiguration()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="totalTickets" class="form-label">Total Tickets</label>
+            <input type="number" class="form-control" id="totalTickets" [(ngModel)]="config.totalTickets">
+          </div>
+          <div class="mb-3">
+            <label for="releaseRate" class="form-label">Release Rate (ms)</label>
+            <input type="number" class="form-control" id="releaseRate" [(ngModel)]="config.vendorReleaseTime">
+          </div>
+          <div class="mb-3">
+            <label for="buyingRate" class="form-label">Buying Rate (ms)</label>
+            <input type="number" class="form-control" id="buyingRate" [(ngModel)]="config.customerBuyTime">
+          </div>
+          <div class="mb-3">
+            <label for="maxCapacity" class="form-label">Max Capacity</label>
+            <input type="number" class="form-control" id="maxCapacity" [(ngModel)]="config.maxPoolSize">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="saveConfiguration()">Save</button>
+        <button type="button" class="btn btn-secondary" (click)="closeConfiguration()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
