@@ -1,103 +1,88 @@
+
 import config.Configuration;
-
+import java.io.IOException;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static config.Configuration.logger;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Configuration config = null;
+        Configuration config;
 
-        System.out.println("Welcome to the Real-Time Ticketing System!");
-        System.out.println("1. Load an existing configuration");
-        System.out.println("2. Create a new configuration");
+        // Prompt user to load or create a configuration
+        System.out.println("Welcome to the Real-Time Event Ticketing System.");
+        System.out.println("1. Load existing configuration");
+        System.out.println("2. Create new configuration");
         System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
 
-        scanner.nextLine(); // Consume newline
-
-        if (choice == 1) {
-            String jsonPath = "config.json"; // Always load from this path
-            config = Configuration.loadFromJson(jsonPath);
-
-            if (config != null) {
-                System.out.println("Configuration loaded successfully.");
-            } else {
-                System.out.println("Failed to load configuration from " + jsonPath + ". Exiting.");
-                System.exit(0);
-            }
-        } else if (choice == 2) {
-            config = new Configuration();
-
-            System.out.print("Enter total tickets: ");
-            config.setTotalTickets(scanner.nextInt());
-
-            System.out.print("Enter maximum pool size: ");
-            config.setMaxPoolSize(scanner.nextInt());
-
-            System.out.print("Enter vendor release time (in ms): ");
-            config.setVendorReleaseTime(scanner.nextInt());
-
-            System.out.print("Enter customer buy time (in ms): ");
-            config.setCustomerBuyTime(scanner.nextInt());
-
-            System.out.println("Configuration created successfully.");
-
-            // Save configurations in the current directory
-            String jsonPath = "config.json";
-            String serPath = "config.ser";
-            String txtPath = "config.txt";
-
-            config.saveToJson(jsonPath);
-            config.saveToSerialized(serPath);
-            config.saveToText(txtPath);
-
-            System.out.println("Configuration saved in the current directory as:");
-            System.out.println(" - JSON: " + jsonPath);
-            System.out.println(" - Serialized: " + serPath);
-            System.out.println(" - Text: " + txtPath);
-        } else {
-            System.out.println("Invalid choice. Exiting.");
-            System.exit(0);
-        }
-
-        // Simulation starts here
-        System.out.println("\nStarting simulation with the following configuration:");
-        System.out.println("Total Tickets: " + config.getTotalTickets());
-        System.out.println("Maximum Pool Size: " + config.getMaxPoolSize());
-        System.out.println("Vendor Release Time: " + config.getVendorReleaseTime() + " ms");
-        System.out.println("Customer Buy Time: " + config.getCustomerBuyTime() + " ms");
-        logger.info("Simulation will start in 2 seconds...");
-
-        // Delay simulation start
+        int choice = new Scanner(System.in).nextInt();
         try {
-            Thread.sleep(2000); // 2-second delay
-        } catch (InterruptedException e) {
-            System.out.println(e);
+            if (choice == 1) {
+                config = Configuration.loadFromFile();
+            } else if (choice == 2) {
+                config = Configuration.createNewConfiguration();
+                config.saveToFile();
+            } else {
+                System.out.println("Invalid choice. Exiting.");
+                return;
+            }
+        } catch (IOException e) {
+            System.err.println("Error handling configuration: " + e.getMessage());
+            return;
         }
 
-        // Create ticket pool and participants
-        TicketPool pool = new TicketPool(config.getMaxPoolSize());
-        int totalTickets = config.getTotalTickets();
+        // Initialize ticket pool
+        TicketPool ticketPool = new TicketPool(config.getMaxPoolSize(), config.getTotalTicketCount());
 
-        Vendor vendor1 = new Vendor("Vendor 1", pool, config.getVendorReleaseTime(), totalTickets / 2);
-        Vendor vendor2 = new Vendor("Vendor 2", pool, config.getVendorReleaseTime(), totalTickets / 2);
+        // Create vendors and customers
+        Thread vendor1 = new Thread(new Vendor(ticketPool, 1, config.getVendorReleaseTime()));
+        Thread vendor2 = new Thread(new Vendor(ticketPool, 2, config.getVendorReleaseTime()));
+        Thread customer1 = new Thread(new Customer(ticketPool, 1, config.getCustomerBuyingTime()));
+        Thread customer2 = new Thread(new Customer(ticketPool, 2, config.getCustomerBuyingTime()));
+        Thread customer3 = new Thread(new Customer(ticketPool, 3, config.getCustomerBuyingTime()));
 
-        Customer customer1 = new Customer("Customer 1", pool, config.getCustomerBuyTime());
-        Customer customer2 = new Customer("Customer 2", pool, config.getCustomerBuyTime());
-        Customer customer3 = new Customer("Customer 3", pool, config.getCustomerBuyTime());
+        // Start simulation
+        System.out.println("Starting the simulation...");
+        vendor1.start();
+        vendor2.start();
+        customer1.start();
+        customer2.start();
+        customer3.start();
 
-        // Run simulation using threads
-        ExecutorService executor = Executors.newCachedThreadPool();
-        executor.execute(vendor1);
-        executor.execute(vendor2);
-        executor.execute(customer1);
-        executor.execute(customer2);
-        executor.execute(customer3);
+        // Monitor ticket status
+        Thread monitorThread = new Thread(() -> {
+            try {
+                while (true) {
+                    int remainingTickets;
+                    int currentPoolSize;
+                    synchronized (ticketPool) {
+                        remainingTickets = ticketPool.getRemainingTickets();
+                        currentPoolSize = ticketPool.getCurrentPoolSize();
+                    }
+                    System.out.println("Real-time status: Pool size = " + currentPoolSize + ", Total tickets left = " + remainingTickets);
+                    if (remainingTickets <= 0 && currentPoolSize == 0) {
+                        System.out.println("All tickets sold out!");
+                        break;
+                    }
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        monitorThread.start();
 
-        logger.info("Simulation started. Check logs for real-time updates.");
+        // Wait for threads to complete
+        try {
+            vendor1.join();
+            vendor2.join();
+            customer1.join();
+            customer2.join();
+            customer3.join();
+            monitorThread.join();
+        } catch (InterruptedException e) {
+            System.err.println("Simulation interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Simulation completed.");
     }
 }

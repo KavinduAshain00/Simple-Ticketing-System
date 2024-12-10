@@ -1,4 +1,0 @@
-Total Tickets: 20
-Max Pool Size: 10
-Vendor Release Time: 2000ms
-Customer Buy Time: 3000ms

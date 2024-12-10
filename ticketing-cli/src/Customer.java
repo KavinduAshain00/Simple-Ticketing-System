@@ -1,35 +1,27 @@
-import java.util.logging.Logger;
+class Customer implements Runnable {
+    private final TicketPool ticketPool;
+    private final int customerId;
+    private final int buyingTime;
 
-public class Customer implements Runnable {
-    private final String name;
-    private final TicketPool pool;
-    private final int buyTime;
-    private static final Logger logger = Logger.getLogger(Customer.class.getName());
-
-    public Customer(String name, TicketPool pool, int buyTime) {
-        this.name = name;
-        this.pool = pool;
-        this.buyTime = buyTime;
+    public Customer(TicketPool ticketPool, int customerId, int buyingTime) {
+        this.ticketPool = ticketPool;
+        this.customerId = customerId;
+        this.buyingTime = buyingTime;
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                Thread.sleep(buyTime);
-                synchronized (pool) {
-                    String ticket = pool.buyTicket();
-                    if (ticket != null) {
-                        logger.info(name + " bought " + ticket);
-                    } else {
-                        logger.warning(name + " could not buy a ticket. Pool is empty.");
-                        break; // Exit when no tickets are available
-                    }
+                if (!ticketPool.buyTicket() && ticketPool.getRemainingTickets() <= 0) {
+                    break;
                 }
+                System.out.println("Customer " + customerId + " bought a ticket.");
+                Thread.sleep(buyingTime);
             }
         } catch (InterruptedException e) {
+            System.err.println("Customer " + customerId + " interrupted.");
             Thread.currentThread().interrupt();
-            logger.severe(name + " interrupted: " + e.getMessage());
         }
     }
 }

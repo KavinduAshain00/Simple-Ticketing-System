@@ -5,24 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c9726b4b-26f2-481f-9317-607bdc4a4626" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/OOPCW.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/gson_2_10_1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config.ser" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Customer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TicketPool.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Vendor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/config/Configuration.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ticketing-cli.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../angular-ui/src/app/configuration/configuration.component.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../angular-ui/src/app/configuration/configuration.component.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../angular-ui/src/app/configuration/configuration.component.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../angular-ui/src/app/configuration/configuration.component.ts" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/configuration.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/configuration.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../angular-ui/src/app/simulation/simulation.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../angular-ui/src/app/simulation/simulation.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Customer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Customer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TicketPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TicketPool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Vendor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Vendor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config/Configuration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/Configuration.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +77,10 @@
       <option name="presentableId" value="Default" />
       <updated>1733761872792</updated>
       <workItem from="1733761873916" duration="3785000" />
-      <workItem from="1733809644096" duration="6061000" />
+      <workItem from="1733809644096" duration="9946000" />
+      <workItem from="1733838861424" duration="4873000" />
+      <workItem from="1733866791720" duration="194000" />
+      <workItem from="1733868383524" duration="4301000" />
     </task>
     <servers />
   </component>

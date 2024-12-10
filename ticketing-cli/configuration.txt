@@ -1,0 +1,4 @@
+totalTicketCount=20
+maxPoolSize=10
+vendorReleaseTime=2000
+customerBuyingTime=3000

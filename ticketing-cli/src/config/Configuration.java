@@ -1,93 +1,78 @@
 package config;
 
-import java.io.*;
-import java.util.logging.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.*;
+import java.util.Scanner;
 
-public class Configuration implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private int totalTickets;
+public class Configuration {
+    private int totalTicketCount;
     private int maxPoolSize;
     private int vendorReleaseTime;
-    private int customerBuyTime;
-    public static final Logger logger = Logger.getLogger(Configuration.class.getName());
+    private int customerBuyingTime;
 
-    // Getters and Setters
-    public int getTotalTickets() {
-        return totalTickets;
+    public Configuration(int totalTicketCount, int maxPoolSize, int vendorReleaseTime, int customerBuyingTime) {
+        this.totalTicketCount = totalTicketCount;
+        this.maxPoolSize = maxPoolSize;
+        this.vendorReleaseTime = vendorReleaseTime;
+        this.customerBuyingTime = customerBuyingTime;
     }
 
-    public void setTotalTickets(int totalTickets) {
-        this.totalTickets = totalTickets;
+    public int getTotalTicketCount() {
+        return totalTicketCount;
     }
 
     public int getMaxPoolSize() {
         return maxPoolSize;
     }
 
-    public void setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
     public int getVendorReleaseTime() {
         return vendorReleaseTime;
     }
 
-    public void setVendorReleaseTime(int vendorReleaseTime) {
-        this.vendorReleaseTime = vendorReleaseTime;
+    public int getCustomerBuyingTime() {
+        return customerBuyingTime;
     }
 
-    public int getCustomerBuyTime() {
-        return customerBuyTime;
-    }
+    public void saveToFile() throws IOException {
+        String jsonFilePath = "configuration.json";
 
-    public void setCustomerBuyTime(int customerBuyTime) {
-        this.customerBuyTime = customerBuyTime;
-    }
-
-    // Save Configuration to JSON
-    public void saveToJson(String fileName) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (Writer writer = new FileWriter(fileName)) {
-            gson.toJson(this, writer);
-            logger.info("Configuration saved to JSON: " + fileName);
-        } catch (IOException e) {
-            logger.severe("Failed to save configuration to JSON: " + e.getMessage());
+        String json = gson.toJson(this);
+
+        try (FileWriter writer = new FileWriter(jsonFilePath)) {
+            writer.write(json);
+            System.out.println("Configuration saved to " + jsonFilePath);
         }
     }
 
-    // Load Configuration from JSON
-    public static Configuration loadFromJson(String fileName) {
+    public static Configuration loadFromFile() throws IOException {
+        String filePath = "configuration.json";
         Gson gson = new Gson();
-        try (Reader reader = new FileReader(fileName)) {
-            return gson.fromJson(reader, Configuration.class);
-        } catch (IOException e) {
-            logger.severe("Failed to load configuration from JSON: " + e.getMessage());
-            return null;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            Configuration config = gson.fromJson(reader, Configuration.class);
+            System.out.println("Configuration loaded from " + filePath);
+            return config;
         }
     }
 
-    // Save Configuration to Serialized (.ser)
-    public void saveToSerialized(String fileName) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            out.writeObject(this);
-            logger.info("Configuration saved to serialized file: " + fileName);
-        } catch (IOException e) {
-            logger.severe("Failed to save configuration to serialized file: " + e.getMessage());
-        }
-    }
+    public static Configuration createNewConfiguration() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Creating a new configuration...");
 
-    // Save Configuration to Plain Text (.txt)
-    public void saveToText(String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write("Total Tickets: " + totalTickets + "\n");
-            writer.write("Max Pool Size: " + maxPoolSize + "\n");
-            writer.write("Vendor Release Time: " + vendorReleaseTime + "ms\n");
-            writer.write("Customer Buy Time: " + customerBuyTime + "ms\n");
-            logger.info("Configuration saved to plain text: " + fileName);
-        } catch (IOException e) {
-            logger.severe("Failed to save configuration to plain text: " + e.getMessage());
-        }
+        System.out.print("Enter total ticket count: ");
+        int totalTicketCount = scanner.nextInt();
+
+        System.out.print("Enter maximum pool size: ");
+        int maxPoolSize = scanner.nextInt();
+
+        System.out.print("Enter vendor release time (ms): ");
+        int vendorReleaseTime = scanner.nextInt();
+
+        System.out.print("Enter customer buying time (ms): ");
+        int customerBuyingTime = scanner.nextInt();
+
+        return new Configuration(totalTicketCount, maxPoolSize, vendorReleaseTime, customerBuyingTime);
     }
 }

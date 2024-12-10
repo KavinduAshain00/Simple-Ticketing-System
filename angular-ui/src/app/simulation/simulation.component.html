@@ -20,13 +20,13 @@
         </div>
         <div class="col-md-4">
           <div class="buttons">
-            <button class="btn btn-secondary mb-3" (click)="openConfiguration()">Edit Configuration</button>
             <button class="btn btn-success btn-lg mb-2" [disabled]="isSimulationRunning" (click)="startSimulation()">
               Start Simulation
             </button>
             <button class="btn btn-danger btn-lg" [disabled]="!isSimulationRunning" (click)="stopSimulation()">
               Stop Simulation
             </button>
+            <button class="btn btn-secondary mb-3" (click)="openConfiguration()">Edit Configuration</button>
           </div>
         </div>
         <!-- Right Section -->
@@ -38,7 +38,7 @@
             <p><li>Buying Rate: {{ config.customerBuyTime }} ms</li></p>
             <p><li>Max pool Size: {{ config.maxPoolSize }}</li></p>
           </ul>
-          
+
         </div>
       </div>
     </div>
