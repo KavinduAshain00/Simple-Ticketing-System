@@ -1,0 +1,6 @@
+{
+  "totalTickets": 20,
+  "maxPoolSize": 10,
+  "vendorReleaseTime": 2000,
+  "customerBuyTime": 3000
+}
