@@ -18,6 +18,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem; /* Adjust the gap as needed */
+  height: 100%;
 }
 
 .info-item {
@@ -180,6 +181,14 @@ input[type="number"]:focus, input[type="text"]:focus {
   opacity: 1;
 }
 
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Add spacing between the buttons */
+   /* Ensure buttons take up the full width of the parent container */
+}
+
+
 /* Layout Adjustments */
 .row.mb-3 {
   display: flex;
@@ -192,7 +201,15 @@ input[type="number"]:focus, input[type="text"]:focus {
   width: 48%;
   margin-bottom: 1rem;
 }
+.col-md-4 {
+  width: 15%;
+  margin-bottom: 1rem;
+}
 
+.col-md-5 {
+  width: 25%;
+  margin-bottom: 1rem;
+}
 @media (max-width: 768px) {
   .row.mb-3 {
     flex-direction: column;
@@ -246,7 +263,16 @@ ul {
 }
 
 ul li::before {
-  content: "•";
   color: #2575fc;
   margin-right: 0.5rem;
+}
+
+ul p {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.topic{
+  font-size: 24px;
+  margin-bottom: 10px;
 }

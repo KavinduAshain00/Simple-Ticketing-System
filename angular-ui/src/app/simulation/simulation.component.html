@@ -18,25 +18,27 @@
             </div>
           </div>
         </div>
-
-        <!-- Right Section -->
-        <div class="col-md-6">
-          <h5>Current Configuration:</h5>
-          <ul>
-            <li>Total Tickets: {{ config.totalTickets }}</li>
-            <li>Release Rate: {{ config.vendorReleaseTime }} ms</li>
-            <li>Buying Rate: {{ config.customerBuyTime }} ms</li>
-            <li>Max Pool Size: {{ config.maxPoolSize }}</li>
-          </ul>
-          <button class="btn btn-secondary mb-3" (click)="openConfiguration()">Edit Configuration</button>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-success btn-lg me-2" [disabled]="isSimulationRunning" (click)="startSimulation()">
+        <div class="col-md-4">
+          <div class="buttons">
+            <button class="btn btn-secondary mb-3" (click)="openConfiguration()">Edit Configuration</button>
+            <button class="btn btn-success btn-lg mb-2" [disabled]="isSimulationRunning" (click)="startSimulation()">
               Start Simulation
             </button>
             <button class="btn btn-danger btn-lg" [disabled]="!isSimulationRunning" (click)="stopSimulation()">
               Stop Simulation
             </button>
           </div>
+        </div>
+        <!-- Right Section -->
+        <div class="col-md-5">
+          <h5 class="topic">Current Configuration:</h5>
+          <ul>
+            <p><li>Total Tickets: {{ config.totalTickets }}</li></p>
+            <p><li>Release Rate: {{ config.vendorReleaseTime }} ms</li></p>
+            <p><li>Buying Rate: {{ config.customerBuyTime }} ms</li></p>
+            <p><li>Max pool Size: {{ config.maxPoolSize }}</li></p>
+          </ul>
+          
         </div>
       </div>
     </div>
@@ -45,6 +47,7 @@
   <!-- Logs Section -->
   <div class="mt-5">
     <mat-list>
+      <br>
       <h3>Logs</h3>
       <mat-list-item *ngFor="let log of logs.slice().reverse()">
         {{ log }}

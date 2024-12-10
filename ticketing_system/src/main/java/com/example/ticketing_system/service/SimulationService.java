@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.ticketing_system.Repositories.ConfigurationRepository;
 import com.example.ticketing_system.Repositories.TicketPoolRepository;
 import com.example.ticketing_system.controller.RealTimeUpdateController;
 import com.example.ticketing_system.model.Configuration;
@@ -19,6 +20,9 @@ public class SimulationService {
     private TicketPoolRepository ticketPoolRepository;
 
     @Autowired
+    private ConfigurationRepository configurationRepository;
+
+    @Autowired
     private RealTimeUpdateController updateController;
 
     private final ScheduledExecutorService vendorScheduler = Executors.newScheduledThreadPool(2);
@@ -28,6 +32,7 @@ public class SimulationService {
         ticketPoolRepository.deleteAll();
         TicketPool pool = new TicketPool(0, config.getTotalTickets());
         ticketPoolRepository.save(pool);
+        configurationRepository.save(config);
 
         // Vendor task: Adds tickets to the pool
         Runnable vendorTask = () -> {
