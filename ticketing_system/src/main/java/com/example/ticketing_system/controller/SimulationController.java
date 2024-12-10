@@ -25,7 +25,11 @@ public class SimulationController {
         System.out.println("simulation started");
         return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"Simulation started!\"}");
     }
-        
-    
+
+    @PostMapping("/stop")
+    public ResponseEntity<Object> stopSimulation() {
+        simulationService.stopSimulation();
+        return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"Simulation stopped!\"}");
+    }
 }
 

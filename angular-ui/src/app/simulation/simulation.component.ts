@@ -22,10 +22,10 @@ export class SimulationComponent implements OnInit {
   isConfigurationModalOpen: boolean = false;
 
   config = {
-    totalTickets: 20,
-    vendorReleaseTime: 1000,
-    customerBuyTime: 2000,
-    maxPoolSize: 10
+    totalTickets: 0,
+    vendorReleaseTime: 0,
+    customerBuyTime: 0,
+    maxPoolSize: 0
   };
 
   private platformId = inject(PLATFORM_ID);
