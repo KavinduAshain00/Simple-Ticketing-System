@@ -13,11 +13,13 @@ class Vendor implements Runnable {
     public void run() {
         try {
             while (true) {
-                if (!ticketPool.addTicket()) {
-                    break;
+                synchronized (ticketPool) {
+                    if (!ticketPool.addTicket()) {
+                        break;
+                    }
+                    System.out.println("Vendor " + vendorId + " added a ticket.");
                 }
-                System.out.println("Vendor " + vendorId + " added a ticket.");
-                Thread.sleep(releaseTime);
+                Thread.sleep(releaseTime); // Wait after each ticket addition
             }
         } catch (InterruptedException e) {
             System.err.println("Vendor " + vendorId + " interrupted.");
