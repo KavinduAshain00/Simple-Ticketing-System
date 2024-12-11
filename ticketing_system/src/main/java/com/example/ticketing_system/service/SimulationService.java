@@ -3,6 +3,7 @@ package com.example.ticketing_system.service;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import com.example.ticketing_system.Repositories.TicketPoolRepository;
 import com.example.ticketing_system.controller.RealTimeUpdateController;
 import com.example.ticketing_system.model.Configuration;
 import com.example.ticketing_system.model.TicketPool;
+import com.example.ticketing_system.model.Vendor;
+import com.example.ticketing_system.model.Customer;
 
 @Service
 public class SimulationService {
@@ -28,75 +31,87 @@ public class SimulationService {
     private ScheduledExecutorService vendorScheduler = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService customerScheduler = Executors.newSingleThreadScheduledExecutor();
 
-    private int vendorIndex = 1; // To alternate vendors
-    private int customerIndex = 1; // To alternate customers
+    private final ReentrantLock lock = new ReentrantLock(); // To ensure thread safety
+
 
     public void startSimulation(Configuration config) {
+
         // Reset the ticket pool
         ticketPoolRepository.deleteAll();
         TicketPool pool = new TicketPool(0, config.getTotalTickets());
-        ticketPoolRepository.save(pool);
 
-        // Step 1: Schedule vendors alternately
+        // Reinitialize schedulers if they are shutdown
         if (vendorScheduler.isShutdown()) {
-            vendorScheduler = Executors.newSingleThreadScheduledExecutor(); // Reinitialize if shutdown
+            vendorScheduler = Executors.newSingleThreadScheduledExecutor();
         }
-        vendorScheduler.scheduleAtFixedRate(() -> runVendorTask(pool, config), 
-            0, config.getVendorReleaseTime(), TimeUnit.MILLISECONDS);
-
-        // Step 2: Schedule customers alternately
         if (customerScheduler.isShutdown()) {
-            customerScheduler = Executors.newSingleThreadScheduledExecutor(); // Reinitialize if shutdown
+            customerScheduler = Executors.newSingleThreadScheduledExecutor();
         }
-        customerScheduler.scheduleAtFixedRate(() -> runCustomerTask(pool, config), 
-            0, config.getCustomerBuyTime(), TimeUnit.MILLISECONDS);
+
+        // Vendor logic
+        vendorScheduler.execute(() -> {
+            int vendorId = 1;
+            while (true) { // Check stop flag
+                lock.lock();
+                try {
+                    if (pool.getRemainingTickets() > 0) {
+                        new Vendor(vendorId, pool, config, lock, ticketPoolRepository, updateController).run();
+                        vendorId = (vendorId % 2) + 1; // Switch between Vendor 1 and Vendor 2
+                    } else {
+                        updateController.sendUpdate("Vendor " + vendorId + " has no more tickets to add. Stopping.");
+                        break;
+                    }
+                } finally {
+                    lock.unlock();
+                }
+                try {
+                    Thread.sleep(config.getVendorReleaseTime());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Interrupt to stop the thread
+                    break;
+                }
+            }
+        });
+
+        // Customer logic
+        customerScheduler.execute(() -> {
+            int customerId = 1;
+            while (true) { // Check stop flag
+                lock.lock();
+                try {
+                    if (pool.getCurrentPoolSize() > 0 || pool.getRemainingTickets() > 0) {
+                        new Customer(customerId, pool, config, lock, ticketPoolRepository, updateController).run();
+                        customerId = (customerId % 3) + 1; // Switch between Customer 1, 2, and 3
+                    } else {
+                        updateController.sendUpdate("All tickets are sold. Simulation ending.");
+                        break;
+                    }
+                } finally {
+                    lock.unlock();
+                }
+                try {
+                    Thread.sleep(config.getCustomerBuyTime());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Interrupt to stop the thread
+                    break;
+                }
+            }
+        });
     }
 
-    public void stopSimulation() {
+    public synchronized void stopSimulation() {
+   
+
         // Shutdown the schedulers gracefully
-        vendorScheduler.shutdown();
-        customerScheduler.shutdown();
+        if (!vendorScheduler.isShutdown()) {
+            vendorScheduler.shutdownNow();
+        }
+        if (!customerScheduler.isShutdown()) {
+            customerScheduler.shutdownNow();
+        }
+
+        // Log simulation stopped only if it was running
         updateController.sendUpdate("Simulation stopped.");
     }
-
-    private void runVendorTask(TicketPool pool, Configuration config) {
-        synchronized (pool) {
-            String vendorName = "Vendor " + vendorIndex;
-            if (pool.getRemainingTickets() > 0 && pool.getCurrentPoolSize() < config.getMaxPoolSize()) {
-                pool.setCurrentPoolSize(pool.getCurrentPoolSize() + 1);
-                pool.setRemainingTickets(pool.getRemainingTickets() - 1);
-                ticketPoolRepository.save(pool);
-                String message = vendorName + " added a ticket. Pool size: " + pool.getCurrentPoolSize() +
-                        ", Remaining tickets: " + pool.getRemainingTickets();
-                updateController.sendUpdate(message);
-            } else if (pool.getRemainingTickets() == 0) {
-                updateController.sendUpdate(vendorName + " has no more tickets to add. Stopping.");
-                vendorScheduler.shutdown();
-                return;
-            }
-            // Alternate vendor index
-            vendorIndex = (vendorIndex % 2) + 1; // Alternates between 1 and 2
-        }
-    }
-
-    private void runCustomerTask(TicketPool pool, Configuration config) {
-        synchronized (pool) {
-            String customerName = "Customer " + customerIndex;
-            if (pool.getCurrentPoolSize() > 0) {
-                pool.setCurrentPoolSize(pool.getCurrentPoolSize() - 1);
-                ticketPoolRepository.save(pool);
-                String message = customerName + " bought a ticket. Pool size: " + pool.getCurrentPoolSize();
-                updateController.sendUpdate(message);
-            }
-
-            // End simulation if no tickets are left
-            if (pool.getCurrentPoolSize() == 0 && pool.getRemainingTickets() == 0) {
-                updateController.sendUpdate("All tickets are sold. Simulation ending.");
-                customerScheduler.shutdown();
-                return;
-            }
-            // Alternate customer index
-            customerIndex = (customerIndex % 3) + 1; // Alternates between 1, 2, and 3
-        }
-    }
 }
+
