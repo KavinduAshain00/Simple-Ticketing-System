@@ -57,7 +57,7 @@
   <div class="mt-5">
     <mat-list>
       <h3>Logs</h3>
-      <mat-list-item *ngFor="let log of logs.slice().reverse()">
+      <mat-list-item *ngFor="let log of logs.slice().reverse()" [ngClass]="{'text-red': isCriticalLog(log)}">
         {{ log }}
       </mat-list-item>
     </mat-list>

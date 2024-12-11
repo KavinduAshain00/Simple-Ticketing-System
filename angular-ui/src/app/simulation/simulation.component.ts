@@ -151,7 +151,7 @@ export class SimulationComponent implements OnInit {
 
   stopSimulation() {
     this.isSimulationRunning = false;
-    this.logs.push('Simulation stopped...');
+    //this.logs.push('Simulation stopped...');
 
     this.apiService.stopSimulation().subscribe({
       next: () => console.log('Simulation stopped successfully'),
@@ -211,4 +211,10 @@ export class SimulationComponent implements OnInit {
 
     this.closeConfiguration();
   }
+  isCriticalLog(log: string): boolean {
+    return log.includes('All tickets are sold. Simulation ending') || 
+           log.includes('has no more tickets to add. Stopping.') ||
+           log.includes('Simulation stopped');
+  }
+  
 }
