@@ -39,8 +39,6 @@ public class SimulationService {
         // Reset the ticket pool
         ticketPoolRepository.deleteAll();
         TicketPool pool = new TicketPool(0, config.getTotalTickets());
-        ticketPoolRepository.save(pool);
-        configurationRepository.save(config);
 
         // Reinitialize schedulers if they are shutdown
         if (vendorScheduler.isShutdown()) {
