@@ -398,3 +398,6 @@ ul p {
   text-align: right;
   border-top: 1px solid #dee2e6;
 }
+.text-red {
+  color: red;
+}
