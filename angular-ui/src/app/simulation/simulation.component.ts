@@ -42,11 +42,11 @@ export class SimulationComponent implements OnInit {
 
   private platformId = inject(PLATFORM_ID);
 
-  constructor(private apiService: ApiService) {} // Inject the ApiService
+  constructor(private apiService: ApiService) {}
 
   ngOnInit() {
-    this.loadLastConfiguration(); // Load the last configuration on initialization
-    this.fetchPreviousConfigurations(); // Load all previous configurations
+    this.loadLastConfiguration();
+    this.fetchPreviousConfigurations();
 
     if (isPlatformBrowser(this.platformId)) {
       const socket = new WebSocket('ws://localhost:8081/api/updates/ws');
@@ -64,7 +64,10 @@ export class SimulationComponent implements OnInit {
         if (remainingMatch) this.remainingTickets = parseInt(remainingMatch[1], 10);
       };
 
-      socket.onerror = (error) => console.error('WebSocket error:', error);
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        alert('WebSocket Error A WebSocket error occurred.');
+      };
 
       socket.onclose = (event) => console.log('WebSocket connection closed:', event);
     } else {
@@ -82,7 +85,10 @@ export class SimulationComponent implements OnInit {
           maxPoolSize: config.maxPoolSize ?? 0
         };
       },
-      error: (err) => console.error('Error fetching last configuration:', err)
+      error: (err) => {
+        console.error('Error fetching last configuration:', err);
+        alert('Configuration Error Failed to load the last configuration.');
+      }
     });
   }
 
@@ -92,7 +98,10 @@ export class SimulationComponent implements OnInit {
         console.log('Fetched configurations:', configs);
         this.previousConfigurations = configs;
       },
-      error: (err) => console.error('Error fetching previous configurations:', err)
+      error: (err) => {
+        console.error('Error fetching previous configurations:', err);
+        alert('Configuration Error Failed to load previous configurations.');
+      }
     });
   }
 
@@ -100,20 +109,20 @@ export class SimulationComponent implements OnInit {
     let isValid = true;
     this.configErrors = { totalTickets: '', vendorReleaseTime: '', customerBuyTime: '', maxPoolSize: '' };
 
-    if (this.config.totalTickets < 0) {
-      this.configErrors.totalTickets = 'Total tickets must be 0 or greater.';
+    if (this.config.totalTickets <= 0) {
+      this.configErrors.totalTickets = 'Total tickets must be greater than 0.';
       isValid = false;
     }
-    if (this.config.vendorReleaseTime < 0) {
-      this.configErrors.vendorReleaseTime = 'Vendor release time must be 0 or greater.';
+    if (this.config.vendorReleaseTime <= 0) {
+      this.configErrors.vendorReleaseTime = 'Vendor release time must be greater than 0.';
       isValid = false;
     }
-    if (this.config.customerBuyTime < 0) {
-      this.configErrors.customerBuyTime = 'Customer buy time must be 0 or greater.';
+    if (this.config.customerBuyTime <= 0) {
+      this.configErrors.customerBuyTime = 'Customer buy time must be greater than 0.';
       isValid = false;
     }
-    if (this.config.maxPoolSize < 0) {
-      this.configErrors.maxPoolSize = 'Max pool size must be 0 or greater.';
+    if (this.config.maxPoolSize <= 0) {
+      this.configErrors.maxPoolSize = 'Max pool size must be greater than 0.';
       isValid = false;
     }
 
@@ -122,7 +131,8 @@ export class SimulationComponent implements OnInit {
 
   startSimulation() {
     if (!this.validateConfiguration()) {
-      this.logs.push('Configuration validation failed. Please fix the errors and try again.');
+      //this.logs.push('Configuration validation failed. Please fix the errors and try again.');
+      alert('Simulation Error Failed to start the simulation.');
       return;
     }
 
@@ -134,6 +144,7 @@ export class SimulationComponent implements OnInit {
       error: (err) => {
         console.error('Error starting simulation', err);
         this.logs.push('Error starting simulation. Please check the backend for issues.');
+        alert('Simulation Error Failed to start the simulation.');
       }
     });
   }
@@ -144,7 +155,10 @@ export class SimulationComponent implements OnInit {
 
     this.apiService.stopSimulation().subscribe({
       next: () => console.log('Simulation stopped successfully'),
-      error: (err) => console.error('Error stopping simulation', err)
+      error: (err) => {
+        console.error('Error stopping simulation', err);
+        alert('Simulation Error Failed to stop the simulation.');
+      }
     });
   }
 
@@ -179,7 +193,8 @@ export class SimulationComponent implements OnInit {
 
   saveConfiguration() {
     if (!this.validateConfiguration()) {
-      this.logs.push('Configuration validation failed. Please fix the errors and try again.');
+      //this.logs.push('Configuration validation failed. Please fix the errors and try again.');
+      alert('Save Error Failed to save the configuration.');
       return;
     }
 
@@ -190,6 +205,7 @@ export class SimulationComponent implements OnInit {
       error: (err) => {
         console.error('Error saving configuration:', err);
         this.logs.push('Error saving configuration. Please try again.');
+        alert('Save Error Failed to save the configuration.');
       }
     });
 
