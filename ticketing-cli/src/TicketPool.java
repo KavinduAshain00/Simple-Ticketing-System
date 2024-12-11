@@ -5,6 +5,19 @@ class TicketPool {
 
     private final int maxPoolSize;
     private int remainingTickets;
+
+    public int getMaxPoolSize() {
+        return maxPoolSize;
+    }
+
+    public void setRemainingTickets(int remainingTickets) {
+        this.remainingTickets = remainingTickets;
+    }
+
+    public void setCurrentPoolSize(int currentPoolSize) {
+        this.currentPoolSize = currentPoolSize;
+    }
+
     private int currentPoolSize;
 
     public TicketPool(int maxPoolSize, int totalTickets) {

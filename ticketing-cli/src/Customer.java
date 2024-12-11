@@ -1,39 +1,41 @@
+import config.Configuration;
+
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Customer implements Runnable {
-    private static final Logger logger = Logger.getLogger(Customer.class.getName());
-    private final TicketPool ticketPool;
-    private final int customerId;
-    private final int buyingTime;
+    private static final Logger logger = Logger.getLogger(Customer.class.getName()); // Add this line
+    private final int id;
+    private final TicketPool pool;
+    private final Configuration config;
+    private final ReentrantLock lock;
 
-    public Customer(TicketPool ticketPool, int customerId, int buyingTime) {
-        this.ticketPool = ticketPool;
-        this.customerId = customerId;
-        this.buyingTime = buyingTime;
+    public Customer(int id, TicketPool pool, Configuration config, ReentrantLock lock
+                     ) {
+        this.id = id;
+        this.pool = pool;
+        this.config = config;
+        this.lock = lock;
+
     }
 
     @Override
     public void run() {
+        lock.lock();
         try {
-            while (true) {
-                synchronized (ticketPool) {
-                    if (ticketPool.getRemainingTickets() == 0 && ticketPool.getCurrentPoolSize() == 0) {
-                        logger.info("Customer " + customerId + " found no tickets left. Stopping.");
-                        break;
-                    }
+            String customerName = "Customer " + id;
+            if (pool.getCurrentPoolSize() > 0) {
+                pool.setCurrentPoolSize(pool.getCurrentPoolSize() - 1);
+                String message = customerName + " bought a ticket. Pool size: " + pool.getCurrentPoolSize();
+                logger.info(message);
+            } else {
+                // All tickets are sold, break out of the loop to stop the simulation
+                logger.info("All tickets are sold. Simulation ending.");
 
-                    if (!ticketPool.buyTicket()) {
-                        logger.warning("Customer " + customerId + " could not buy a ticket. Retrying...");
-                    } else {
-                        logger.info("Customer " + customerId + " successfully bought a ticket.");
-                    }
-                }
-                Thread.sleep(buyingTime);
             }
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Customer " + customerId + " was interrupted.", e);
-            Thread.currentThread().interrupt();
+        } finally {
+            lock.unlock();
         }
     }
 }

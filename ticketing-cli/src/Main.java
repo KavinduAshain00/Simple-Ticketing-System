@@ -4,12 +4,18 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
+    private static final ReentrantLock lock = new ReentrantLock();
+
+    private static ScheduledExecutorService vendorScheduler = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService customerScheduler = Executors.newSingleThreadScheduledExecutor();
 
     public static void main(String[] args) {
         configureLogger();
@@ -38,26 +44,67 @@ public class Main {
             }
 
             // Initialize ticket pool
-            TicketPool ticketPool = new TicketPool(config.getMaxPoolSize(), config.getTotalTicketCount());
-            logger.info("Ticket pool initialized with max pool size: " + config.getMaxPoolSize() + ", total tickets: " + config.getTotalTicketCount());
+            TicketPool pool = new TicketPool(0, config.getTotalTicketCount());
 
-            // Create thread pool
-            ExecutorService executor = Executors.newCachedThreadPool();
-
-            // Create and start vendor threads
-            for (int i = 1; i <= 2; i++) {
-                executor.execute(new Vendor(ticketPool, i, config.getVendorReleaseTime()));
+            // Reinitialize schedulers if they are shutdown
+            if (vendorScheduler.isShutdown()) {
+                vendorScheduler = Executors.newSingleThreadScheduledExecutor();
+            }
+            if (customerScheduler.isShutdown()) {
+                customerScheduler = Executors.newSingleThreadScheduledExecutor();
             }
 
-            // Create and start customer threads
-            for (int i = 1; i <= 3; i++) {
-                executor.execute(new Customer(ticketPool, i, config.getCustomerBuyingTime()));
-            }
+            // Vendor logic
+            vendorScheduler.execute(() -> {
+                int vendorId = 1;
+                while (true) { // Check stop flag
+                    lock.lock();
+                    try {
+                        if (pool.getRemainingTickets() > 0) {
+                            new Vendor(vendorId, pool, config, lock).run();
+                            vendorId = (vendorId % 2) + 1; // Switch between Vendor 1 and Vendor 2
+                        } else {
+                            logger.info("Vendor " + vendorId + " has no more tickets to add. Stopping.");
+                            break;
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+                    try {
+                        Thread.sleep(config.getVendorReleaseTime());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // Interrupt to stop the thread
+                        break;
+                    }
+                }
+            });
 
-            executor.shutdown();
-
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error handling configuration: " + e.getMessage(), e);
+            // Customer logic
+            customerScheduler.execute(() -> {
+                int customerId = 1;
+                while (true) { // Check stop flag
+                    lock.lock();
+                    try {
+                        if (pool.getCurrentPoolSize() > 0 || pool.getRemainingTickets() > 0) {
+                            new Customer(customerId, pool, config, lock).run();
+                            customerId = (customerId % 3) + 1; // Switch between Customer 1, 2, and 3
+                        } else {
+                            logger.info("All tickets are sold. Simulation ending.");
+                            break;
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+                    try {
+                        Thread.sleep(config.getCustomerBuyingTime());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // Interrupt to stop the thread
+                        break;
+                    }
+                }
+            });
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
