@@ -1,11 +1,10 @@
-class Customer implements Runnable {
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Customer implements Runnable {
+    private static final Logger logger = Logger.getLogger(Customer.class.getName());
     private final TicketPool ticketPool;
     private final int customerId;
-
-    public int getBuyingTime() {
-        return buyingTime;
-    }
-
     private final int buyingTime;
 
     public Customer(TicketPool ticketPool, int customerId, int buyingTime) {
@@ -19,20 +18,21 @@ class Customer implements Runnable {
         try {
             while (true) {
                 synchronized (ticketPool) {
-                    // Check if there are any tickets available to buy
-                    if (!ticketPool.buyTicket() && ticketPool.getRemainingTickets() > 0) {
-                        System.out.println("Customer " + customerId + " could not buy a ticket.");
-                        Thread.sleep(buyingTime);  // Wait before trying again
-                        continue;  // Skip the rest of the loop and check again
+                    if (ticketPool.getRemainingTickets() == 0 && ticketPool.getCurrentPoolSize() == 0) {
+                        logger.info("Customer " + customerId + " found no tickets left. Stopping.");
+                        break;
                     }
 
-                    // If a ticket was successfully bought
-                    System.out.println("Customer " + customerId + " bought a ticket.");
+                    if (!ticketPool.buyTicket()) {
+                        logger.warning("Customer " + customerId + " could not buy a ticket. Retrying...");
+                    } else {
+                        logger.info("Customer " + customerId + " successfully bought a ticket.");
+                    }
                 }
-                Thread.sleep(buyingTime); // Wait after each purchase
+                Thread.sleep(buyingTime);
             }
         } catch (InterruptedException e) {
-            System.err.println("Customer " + customerId + " interrupted.");
+            logger.log(Level.SEVERE, "Customer " + customerId + " was interrupted.", e);
             Thread.currentThread().interrupt();
         }
     }

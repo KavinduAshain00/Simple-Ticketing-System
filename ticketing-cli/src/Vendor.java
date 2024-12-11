@@ -1,4 +1,9 @@
-class Vendor implements Runnable {
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Vendor implements Runnable {
+    private static final Logger logger = Logger.getLogger(Vendor.class.getName());
+
     private final TicketPool ticketPool;
     private final int vendorId;
     private final int releaseTime;
@@ -14,15 +19,21 @@ class Vendor implements Runnable {
         try {
             while (true) {
                 synchronized (ticketPool) {
-                    if (!ticketPool.addTicket()) {
+                    if (ticketPool.getRemainingTickets() == 0) {
+                        logger.info("Vendor " + vendorId + " found no more tickets to add. Stopping.");
                         break;
                     }
-                    System.out.println("Vendor " + vendorId + " added a ticket.");
+
+                    if (ticketPool.addTicket()) {
+                        logger.info("Vendor " + vendorId + " successfully added a ticket.");
+                    } else {
+                        logger.warning("Vendor " + vendorId + " could not add a ticket (pool full).");
+                    }
                 }
-                Thread.sleep(releaseTime); // Wait after each ticket addition
+                Thread.sleep(releaseTime);
             }
         } catch (InterruptedException e) {
-            System.err.println("Vendor " + vendorId + " interrupted.");
+            logger.log(Level.SEVERE, "Vendor " + vendorId + " was interrupted.", e);
             Thread.currentThread().interrupt();
         }
     }

@@ -2,20 +2,14 @@ import config.Configuration;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
-    private static ScheduledExecutorService vendorScheduler = Executors.newSingleThreadScheduledExecutor();
-    private static ScheduledExecutorService customerScheduler = Executors.newSingleThreadScheduledExecutor();
-
-    private static int vendorIndex = 1; // To alternate vendors
-    private static int customerIndex = 1; // To alternate customers
 
     public static void main(String[] args) {
         configureLogger();
@@ -32,10 +26,12 @@ public class Main {
             if (choice == 1) {
                 config = Configuration.loadFromFile();
                 logger.info("Configuration loaded successfully.");
+                System.out.println("Loaded Configuration:\n" + config);
             } else if (choice == 2) {
                 config = Configuration.createNewConfiguration();
                 config.saveToFile();
                 logger.info("New configuration created and saved.");
+                System.out.println("Created Configuration:\n" + config);
             } else {
                 logger.warning("Invalid choice. Exiting.");
                 return;
@@ -45,69 +41,23 @@ public class Main {
             TicketPool ticketPool = new TicketPool(config.getMaxPoolSize(), config.getTotalTicketCount());
             logger.info("Ticket pool initialized with max pool size: " + config.getMaxPoolSize() + ", total tickets: " + config.getTotalTicketCount());
 
-            // Schedule vendor and customer tasks
-            vendorScheduler.scheduleAtFixedRate(() -> runVendorTask(ticketPool, config),
-                    0, config.getVendorReleaseTime(), TimeUnit.MILLISECONDS);
+            // Create thread pool
+            ExecutorService executor = Executors.newCachedThreadPool();
 
-            customerScheduler.scheduleAtFixedRate(() -> runCustomerTask(ticketPool, config),
-                    0, config.getCustomerBuyingTime(), TimeUnit.MILLISECONDS);
+            // Create and start vendor threads
+            for (int i = 1; i <= 2; i++) {
+                executor.execute(new Vendor(ticketPool, i, config.getVendorReleaseTime()));
+            }
 
-            // Monitor ticket pool status
-            new Thread(() -> monitorPool(ticketPool)).start();
+            // Create and start customer threads
+            for (int i = 1; i <= 3; i++) {
+                executor.execute(new Customer(ticketPool, i, config.getCustomerBuyingTime()));
+            }
+
+            executor.shutdown();
 
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error handling configuration: " + e.getMessage(), e);
-        }
-    }
-
-    private static void runVendorTask(TicketPool pool, Configuration config) {
-        synchronized (pool) {
-            String vendorName = "Vendor " + vendorIndex;
-            if (pool.addTicket()) {
-                logger.info(vendorName + " added a ticket.");
-            } else if (pool.getRemainingTickets() == 0) {
-                logger.info("No more tickets to add. Vendors shutting down.");
-                vendorScheduler.shutdown();
-            }
-            vendorIndex = (vendorIndex % 2) + 1; // Alternate vendors
-        }
-    }
-
-    private static void runCustomerTask(TicketPool pool, Configuration config) {
-        synchronized (pool) {
-            String customerName = "Customer " + customerIndex;
-            if (pool.buyTicket()) {
-                logger.info(customerName + " bought a ticket.");
-            }
-
-            if (pool.getCurrentPoolSize() == 0 && pool.getRemainingTickets() == 0) {
-                logger.info("All tickets sold. Customers shutting down.");
-                customerScheduler.shutdown();
-            }
-            customerIndex = (customerIndex % 3) + 1; // Alternate customers
-        }
-    }
-
-    private static void monitorPool(TicketPool pool) {
-        try {
-            while (true) {
-                synchronized (pool) {
-                    int remainingTickets = pool.getRemainingTickets();
-                    int currentPoolSize = pool.getCurrentPoolSize();
-                    //logger.fine("Monitoring - Pool size: " + currentPoolSize + ", Remaining tickets: " + remainingTickets);
-
-                    if (remainingTickets == 0 && currentPoolSize == 0) {
-                        logger.info("All tickets sold out! Simulation ending.");
-                        vendorScheduler.shutdown();
-                        customerScheduler.shutdown();
-                        return;
-                    }
-                }
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.log(Level.WARNING, "Monitor interrupted: " + e.getMessage(), e);
         }
     }
 

@@ -11,10 +11,10 @@ import java.util.logging.Logger;
 public class Configuration {
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
 
-    private int totalTicketCount;
-    private int maxPoolSize;
-    private int vendorReleaseTime;
-    private int customerBuyingTime;
+    private final int totalTicketCount;
+    private final int maxPoolSize;
+    private final int vendorReleaseTime;
+    private final int customerBuyingTime;
 
     public Configuration(int totalTicketCount, int maxPoolSize, int vendorReleaseTime, int customerBuyingTime) {
         this.totalTicketCount = totalTicketCount;
@@ -65,6 +65,33 @@ public class Configuration {
             return config;
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error loading configuration from file", e);
+            throw e;
+        }
+    }
+
+    public void saveToTextFile() throws IOException {
+        String textFilePath = "configuration.txt";
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(textFilePath))) {
+            writer.println("Total Ticket Count: " + totalTicketCount);
+            writer.println("Max Pool Size: " + maxPoolSize);
+            writer.println("Vendor Release Time (ms): " + vendorReleaseTime);
+            writer.println("Customer Buying Time (ms): " + customerBuyingTime);
+            logger.info("Configuration saved to " + textFilePath);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error saving configuration to text file", e);
+            throw e;
+        }
+    }
+
+    public void saveToSerializedFile() throws IOException {
+        String serializedFilePath = "configuration.ser";
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(serializedFilePath))) {
+            oos.writeObject(this);
+            logger.info("Configuration saved to " + serializedFilePath);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error saving configuration to serialized file", e);
             throw e;
         }
     }
