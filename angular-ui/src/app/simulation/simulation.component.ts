@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
 import { PLATFORM_ID } from '@angular/core';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-simulation',
@@ -30,9 +31,11 @@ export class SimulationComponent implements OnInit {
 
   private platformId = inject(PLATFORM_ID);
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {} // Inject the ApiService
 
   ngOnInit() {
+    this.loadLastConfiguration(); // Load configuration on initialization
+
     if (isPlatformBrowser(this.platformId)) {
       const socket = new WebSocket('ws://localhost:8081/api/updates/ws');
 
@@ -57,11 +60,25 @@ export class SimulationComponent implements OnInit {
     }
   }
 
+  loadLastConfiguration() {
+    this.apiService.getLastConfigurations().subscribe({
+      next: (config: any) => {
+        this.config = {
+          totalTickets: config.totalTickets ?? 0,
+          vendorReleaseTime: config.vendorReleaseTime ?? 0,
+          customerBuyTime: config.customerBuyTime ?? 0,
+          maxPoolSize: config.maxPoolSize ?? 0
+        };
+      },
+      error: (err) => console.error('Error fetching last configuration:', err)
+    });
+  }
+
   startSimulation() {
     this.isSimulationRunning = true;
     this.logs = []; // Reset logs when starting a new simulation
 
-    this.http.post('http://localhost:8081/api/simulation/start', this.config).subscribe({
+    this.apiService.startSimulation(this.config).subscribe({
       next: () => this.logs.push('Simulation started...'),
       error: (err) => {
         console.error('Error starting simulation', err);
@@ -73,7 +90,7 @@ export class SimulationComponent implements OnInit {
   stopSimulation() {
     this.isSimulationRunning = false;
     this.logs.push('Simulation stopped...');
-    this.http.post('http://localhost:8081/api/simulation/stop', {}).subscribe({
+    this.apiService.saveConfiguration({}).subscribe({
       next: () => console.log('Simulation stopped successfully'),
       error: (err) => console.error('Error stopping simulation', err)
     });
@@ -89,6 +106,10 @@ export class SimulationComponent implements OnInit {
 
   saveConfiguration() {
     console.log('Configuration saved:', this.config);
+    this.apiService.saveConfiguration(this.config).subscribe({
+      next: () => console.log('Configuration saved successfully'),
+      error: (err) => console.error('Error saving configuration:', err)
+    });
     this.closeConfiguration();
   }
 }
