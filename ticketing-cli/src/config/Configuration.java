@@ -2,10 +2,15 @@ package config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Configuration {
+    private static final Logger logger = Logger.getLogger(Configuration.class.getName());
+
     private int totalTicketCount;
     private int maxPoolSize;
     private int vendorReleaseTime;
@@ -16,6 +21,7 @@ public class Configuration {
         this.maxPoolSize = maxPoolSize;
         this.vendorReleaseTime = vendorReleaseTime;
         this.customerBuyingTime = customerBuyingTime;
+        logger.info("Configuration created: " + this);
     }
 
     public int getTotalTicketCount() {
@@ -42,7 +48,10 @@ public class Configuration {
 
         try (FileWriter writer = new FileWriter(jsonFilePath)) {
             writer.write(json);
-            System.out.println("Configuration saved to " + jsonFilePath);
+            logger.info("Configuration saved to " + jsonFilePath);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error saving configuration to file", e);
+            throw e;
         }
     }
 
@@ -52,14 +61,17 @@ public class Configuration {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             Configuration config = gson.fromJson(reader, Configuration.class);
-            System.out.println("Configuration loaded from " + filePath);
+            logger.info("Configuration loaded from " + filePath);
             return config;
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error loading configuration from file", e);
+            throw e;
         }
     }
 
     public static Configuration createNewConfiguration() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Creating a new configuration...");
+        logger.info("Creating a new configuration...");
 
         System.out.print("Enter total ticket count: ");
         int totalTicketCount = scanner.nextInt();
@@ -73,6 +85,18 @@ public class Configuration {
         System.out.print("Enter customer buying time (ms): ");
         int customerBuyingTime = scanner.nextInt();
 
-        return new Configuration(totalTicketCount, maxPoolSize, vendorReleaseTime, customerBuyingTime);
+        Configuration config = new Configuration(totalTicketCount, maxPoolSize, vendorReleaseTime, customerBuyingTime);
+        logger.info("New configuration created: " + config);
+        return config;
+    }
+
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "totalTicketCount=" + totalTicketCount +
+                ", maxPoolSize=" + maxPoolSize +
+                ", vendorReleaseTime=" + vendorReleaseTime +
+                ", customerBuyingTime=" + customerBuyingTime +
+                '}';
     }
 }

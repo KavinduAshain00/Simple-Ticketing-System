@@ -5,8 +5,12 @@ import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
     private static ScheduledExecutorService vendorScheduler = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledExecutorService customerScheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -14,9 +18,11 @@ public class Main {
     private static int customerIndex = 1; // To alternate customers
 
     public static void main(String[] args) {
+        configureLogger();
+
         Configuration config;
 
-        System.out.println("Welcome to the Real-Time Event Ticketing System.");
+        logger.info("Welcome to the Real-Time Event Ticketing System.");
         System.out.println("1. Load existing configuration");
         System.out.println("2. Create new configuration");
         System.out.print("Enter your choice: ");
@@ -25,16 +31,19 @@ public class Main {
         try {
             if (choice == 1) {
                 config = Configuration.loadFromFile();
+                logger.info("Configuration loaded successfully.");
             } else if (choice == 2) {
                 config = Configuration.createNewConfiguration();
                 config.saveToFile();
+                logger.info("New configuration created and saved.");
             } else {
-                System.out.println("Invalid choice. Exiting.");
+                logger.warning("Invalid choice. Exiting.");
                 return;
             }
 
             // Initialize ticket pool
             TicketPool ticketPool = new TicketPool(config.getMaxPoolSize(), config.getTotalTicketCount());
+            logger.info("Ticket pool initialized with max pool size: " + config.getMaxPoolSize() + ", total tickets: " + config.getTotalTicketCount());
 
             // Schedule vendor and customer tasks
             vendorScheduler.scheduleAtFixedRate(() -> runVendorTask(ticketPool, config),
@@ -47,7 +56,7 @@ public class Main {
             new Thread(() -> monitorPool(ticketPool)).start();
 
         } catch (IOException e) {
-            System.err.println("Error handling configuration: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error handling configuration: " + e.getMessage(), e);
         }
     }
 
@@ -55,9 +64,9 @@ public class Main {
         synchronized (pool) {
             String vendorName = "Vendor " + vendorIndex;
             if (pool.addTicket()) {
-                System.out.println(vendorName + " added a ticket.");
+                logger.info(vendorName + " added a ticket.");
             } else if (pool.getRemainingTickets() == 0) {
-                System.out.println("No more tickets to add. Vendors shutting down.");
+                logger.info("No more tickets to add. Vendors shutting down.");
                 vendorScheduler.shutdown();
             }
             vendorIndex = (vendorIndex % 2) + 1; // Alternate vendors
@@ -68,11 +77,11 @@ public class Main {
         synchronized (pool) {
             String customerName = "Customer " + customerIndex;
             if (pool.buyTicket()) {
-                System.out.println(customerName + " bought a ticket.");
+                logger.info(customerName + " bought a ticket.");
             }
 
             if (pool.getCurrentPoolSize() == 0 && pool.getRemainingTickets() == 0) {
-                System.out.println("All tickets sold. Customers shutting down.");
+                logger.info("All tickets sold. Customers shutting down.");
                 customerScheduler.shutdown();
             }
             customerIndex = (customerIndex % 3) + 1; // Alternate customers
@@ -85,10 +94,10 @@ public class Main {
                 synchronized (pool) {
                     int remainingTickets = pool.getRemainingTickets();
                     int currentPoolSize = pool.getCurrentPoolSize();
-                    //System.out.println("Monitoring - Pool size: " + currentPoolSize + ", Remaining tickets: " + remainingTickets);
+                    //logger.fine("Monitoring - Pool size: " + currentPoolSize + ", Remaining tickets: " + remainingTickets);
 
                     if (remainingTickets == 0 && currentPoolSize == 0) {
-                        System.out.println("All tickets sold out! Simulation ending.");
+                        logger.info("All tickets sold out! Simulation ending.");
                         vendorScheduler.shutdown();
                         customerScheduler.shutdown();
                         return;
@@ -98,7 +107,16 @@ public class Main {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.err.println("Monitor interrupted: " + e.getMessage());
+            logger.log(Level.WARNING, "Monitor interrupted: " + e.getMessage(), e);
         }
+    }
+
+    private static void configureLogger() {
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        logger.addHandler(consoleHandler);
+        logger.setUseParentHandlers(false);
+        logger.setLevel(Level.ALL);
+        logger.info("Logger configured.");
     }
 }
