@@ -36,7 +36,6 @@ public class SimulationService {
         ticketPoolRepository.deleteAll();
         TicketPool pool = new TicketPool(0, config.getTotalTickets());
         ticketPoolRepository.save(pool);
-        configurationRepository.save(config);
 
         // Step 1: Schedule vendors alternately
         if (vendorScheduler.isShutdown()) {

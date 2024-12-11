@@ -79,6 +79,16 @@
   transform: translateY(-2px);
 }
 
+.btn-primary {
+  background: linear-gradient(135deg, #2a28a7, #7a8ce0);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0d83d1, #0e51aa);
+  transform: translateY(-2px);
+}
+
 .btn-danger {
   background: linear-gradient(135deg, #dc3545, #ff6b6b);
   color: white;
@@ -124,7 +134,7 @@ input[type="number"]:focus, input[type="text"]:focus {
 }
 
 /* Modal Styling */
-.modal-backdrop {
+.config-modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -137,18 +147,19 @@ input[type="number"]:focus, input[type="text"]:focus {
   z-index: 1040;
 }
 
-.modal-dialog {
+.config-modal-dialog {
   max-width: 600px;
   width: 100%;
   border-radius: 20px;
 }
 
-.modal-content {
+.config-modal-content {
   border-radius: 20px;
+  background: white;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-.modal-header {
+.config-modal-header {
   background: #2575fc;
   color: white;
   border-bottom: none;
@@ -156,17 +167,22 @@ input[type="number"]:focus, input[type="text"]:focus {
   border-radius: 20px 20px 0 0;
 }
 
-.modal-body {
+.config-modal-title {
+  margin: 0;
+}
+
+.config-modal-body {
   padding: 2rem;
   background: #ffffff;
   border-radius: 0 0 20px 20px;
 }
 
-.modal-footer {
+.config-modal-footer {
   border-top: none;
   padding: 1.5rem 2rem;
   text-align: right;
 }
+
 
 .btn-close {
   background: none;
@@ -275,4 +291,110 @@ ul p {
 .topic{
   font-size: 24px;
   margin-bottom: 10px;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+/* Modal Dialog */
+.modal-dialog {
+  max-width: 90%;
+  max-height: 80%; /* Ensure modal doesn't exceed the screen height */
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Allow the modal to grow vertically */
+}
+
+/* Modal Header */
+.modal-header {
+  text-align: center;
+  background: #2575fc;
+  color: white;
+  border-bottom: none;
+  padding: 1.5rem 2rem;
+}
+
+/* Modal Body */
+.modal-body {
+  flex: 1; /* Take available vertical space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 12px;
+  max-height: 400px; /* Optional: limit height to prevent oversized modals */
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns for medium devices */
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(5, 1fr); /* 5 columns for larger screens */
+  }
+}
+
+@media (max-width: 767px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller devices */
+  }
+}
+
+@media (max-width: 480px) {
+  .card-grid {
+    grid-template-columns: 1fr; /* Single column for extra small devices */
+  }
+}
+
+
+
+/* Configuration Card */
+.config-card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.config-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Configuration Title */
+.config-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 8px;
+  text-align: right;
+  border-top: 1px solid #dee2e6;
 }

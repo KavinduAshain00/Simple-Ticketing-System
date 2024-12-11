@@ -18,27 +18,36 @@
             </div>
           </div>
         </div>
+
+        <!-- Button Section -->
         <div class="col-md-4">
           <div class="buttons">
-            <button class="btn btn-success btn-lg mb-2" [disabled]="isSimulationRunning" (click)="startSimulation()">
+            <button
+              class="btn btn-success btn-lg mb-2"
+              [disabled]="isSimulationRunning || !validateConfiguration()"
+              (click)="startSimulation()">
               Start Simulation
             </button>
-            <button class="btn btn-danger btn-lg" [disabled]="!isSimulationRunning" (click)="stopSimulation()">
+            <button
+              class="btn btn-danger btn-lg"
+              [disabled]="!isSimulationRunning"
+              (click)="stopSimulation()">
               Stop Simulation
             </button>
             <button class="btn btn-secondary mb-3" (click)="openConfiguration()">Edit Configuration</button>
+            <button class="btn btn-primary mb-3" (click)="openLoadConfigurationPopup()">Load Configuration</button>
           </div>
         </div>
-        <!-- Right Section -->
+
+        <!-- Configuration Section -->
         <div class="col-md-5">
           <h5 class="topic">Current Configuration:</h5>
           <ul>
-            <p><li>Total Tickets: {{ config.totalTickets }}</li></p>
-            <p><li>Release Rate: {{ config.vendorReleaseTime }} ms</li></p>
-            <p><li>Buying Rate: {{ config.customerBuyTime }} ms</li></p>
-            <p><li>Max pool Size: {{ config.maxPoolSize }}</li></p>
+            <li>Total Tickets: {{ config.totalTickets }}</li>
+            <li>Release Rate: {{ config.vendorReleaseTime }} ms</li>
+            <li>Buying Rate: {{ config.customerBuyTime }} ms</li>
+            <li>Max Pool Size: {{ config.maxPoolSize }}</li>
           </ul>
-
         </div>
       </div>
     </div>
@@ -47,7 +56,6 @@
   <!-- Logs Section -->
   <div class="mt-5">
     <mat-list>
-      <br>
       <h3>Logs</h3>
       <mat-list-item *ngFor="let log of logs.slice().reverse()">
         {{ log }}
@@ -56,15 +64,45 @@
   </div>
 </div>
 
-<!-- Configuration Modal -->
-<div class="modal-backdrop" *ngIf="isConfigurationModalOpen">
+<!-- Load Configuration Popup -->
+<div class="modal-backdrop" *ngIf="isLoadConfigurationPopupOpen">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Simulation Configuration</h5>
-        <button type="button" class="btn-close" (click)="closeConfiguration()"></button>
+        <h5 class="modal-title">Load Configurations</h5>
+        <button type="button" class="btn-close" (click)="closeLoadConfigurationPopup()"></button>
       </div>
       <div class="modal-body">
+        <div class="card-grid">
+          <div
+            *ngFor="let configuration of previousConfigurations"
+            class="config-card"
+            (click)="loadConfiguration(configuration)"
+          >
+            <h6 class="config-title">Configuration ID: {{ configuration.id }}</h6>
+            <p><strong>Total Tickets:</strong> {{ configuration.totalTickets }}</p>
+            <p><strong>Max Pool Size:</strong> {{ configuration.maxPoolSize }}</p>
+            <p><strong>Release Rate:</strong> {{ configuration.vendorReleaseTime }}</p>
+            <p><strong>Buying Rate:</strong> {{ configuration.customerBuyTime }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeLoadConfigurationPopup()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Configuration Modal -->
+<div class="config-modal-backdrop" *ngIf="isConfigurationModalOpen">
+  <div class="config-modal-dialog">
+    <div class="config-modal-content">
+      <div class="config-modal-header">
+        <h5 class="config-modal-title">Edit Simulation Configuration</h5>
+        <button type="button" class="btn-close" (click)="closeConfiguration()"></button>
+      </div>
+      <div class="config-modal-body">
         <form>
           <div class="mb-3">
             <label for="totalTickets" class="form-label">Total Tickets</label>
@@ -74,7 +112,9 @@
               id="totalTickets"
               [(ngModel)]="config.totalTickets"
               name="totalTickets"
+              [class.is-invalid]="configErrors.totalTickets"
             />
+            <div *ngIf="configErrors.totalTickets" class="text-danger">{{ configErrors.totalTickets }}</div>
           </div>
           <div class="mb-3">
             <label for="releaseRate" class="form-label">Release Rate (ms)</label>
@@ -84,7 +124,9 @@
               id="releaseRate"
               [(ngModel)]="config.vendorReleaseTime"
               name="releaseRate"
+              [class.is-invalid]="configErrors.vendorReleaseTime"
             />
+            <div *ngIf="configErrors.vendorReleaseTime" class="text-danger">{{ configErrors.vendorReleaseTime }}</div>
           </div>
           <div class="mb-3">
             <label for="buyingRate" class="form-label">Buying Rate (ms)</label>
@@ -94,21 +136,25 @@
               id="buyingRate"
               [(ngModel)]="config.customerBuyTime"
               name="buyingRate"
+              [class.is-invalid]="configErrors.customerBuyTime"
             />
+            <div *ngIf="configErrors.customerBuyTime" class="text-danger">{{ configErrors.customerBuyTime }}</div>
           </div>
           <div class="mb-3">
-            <label for="maxCapacity" class="form-label">Max Capacity</label>
+            <label for="maxCapacity" class="form-label">Max Pool Size</label>
             <input
               type="number"
               class="form-control"
               id="maxCapacity"
               [(ngModel)]="config.maxPoolSize"
               name="maxCapacity"
+              [class.is-invalid]="configErrors.maxPoolSize"
             />
+            <div *ngIf="configErrors.maxPoolSize" class="text-danger">{{ configErrors.maxPoolSize }}</div>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
+      <div class="config-modal-footer">
         <button type="button" class="btn btn-primary" (click)="saveConfiguration()">Save</button>
         <button type="button" class="btn btn-secondary" (click)="closeConfiguration()">Close</button>
       </div>

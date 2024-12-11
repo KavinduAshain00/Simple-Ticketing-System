@@ -21,6 +21,7 @@ export class SimulationComponent implements OnInit {
   remainingTickets: number = 0;
   isSimulationRunning: boolean = false;
   isConfigurationModalOpen: boolean = false;
+  isLoadConfigurationPopupOpen: boolean = false;
 
   config = {
     totalTickets: 0,
@@ -29,12 +30,23 @@ export class SimulationComponent implements OnInit {
     maxPoolSize: 0
   };
 
+  configErrors: any = {
+    totalTickets: '',
+    vendorReleaseTime: '',
+    customerBuyTime: '',
+    maxPoolSize: ''
+  };
+
+  previousConfigurations: any[] = [];
+  selectedConfiguration: any = null;
+
   private platformId = inject(PLATFORM_ID);
 
   constructor(private apiService: ApiService) {} // Inject the ApiService
 
   ngOnInit() {
-    this.loadLastConfiguration(); // Load configuration on initialization
+    this.loadLastConfiguration(); // Load the last configuration on initialization
+    this.fetchPreviousConfigurations(); // Load all previous configurations
 
     if (isPlatformBrowser(this.platformId)) {
       const socket = new WebSocket('ws://localhost:8081/api/updates/ws');
@@ -74,7 +86,46 @@ export class SimulationComponent implements OnInit {
     });
   }
 
+  fetchPreviousConfigurations() {
+    this.apiService.getAllConfigurations().subscribe({
+      next: (configs: any[]) => {
+        console.log('Fetched configurations:', configs);
+        this.previousConfigurations = configs;
+      },
+      error: (err) => console.error('Error fetching previous configurations:', err)
+    });
+  }
+
+  validateConfiguration(): boolean {
+    let isValid = true;
+    this.configErrors = { totalTickets: '', vendorReleaseTime: '', customerBuyTime: '', maxPoolSize: '' };
+
+    if (this.config.totalTickets < 0) {
+      this.configErrors.totalTickets = 'Total tickets must be 0 or greater.';
+      isValid = false;
+    }
+    if (this.config.vendorReleaseTime < 0) {
+      this.configErrors.vendorReleaseTime = 'Vendor release time must be 0 or greater.';
+      isValid = false;
+    }
+    if (this.config.customerBuyTime < 0) {
+      this.configErrors.customerBuyTime = 'Customer buy time must be 0 or greater.';
+      isValid = false;
+    }
+    if (this.config.maxPoolSize < 0) {
+      this.configErrors.maxPoolSize = 'Max pool size must be 0 or greater.';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
   startSimulation() {
+    if (!this.validateConfiguration()) {
+      this.logs.push('Configuration validation failed. Please fix the errors and try again.');
+      return;
+    }
+
     this.isSimulationRunning = true;
     this.logs = []; // Reset logs when starting a new simulation
 
@@ -90,7 +141,8 @@ export class SimulationComponent implements OnInit {
   stopSimulation() {
     this.isSimulationRunning = false;
     this.logs.push('Simulation stopped...');
-    this.apiService.saveConfiguration({}).subscribe({
+
+    this.apiService.stopSimulation().subscribe({
       next: () => console.log('Simulation stopped successfully'),
       error: (err) => console.error('Error stopping simulation', err)
     });
@@ -104,12 +156,43 @@ export class SimulationComponent implements OnInit {
     this.isConfigurationModalOpen = false;
   }
 
+  openLoadConfigurationPopup() {
+    this.isLoadConfigurationPopupOpen = true;
+  }
+
+  closeLoadConfigurationPopup() {
+    this.isLoadConfigurationPopupOpen = false;
+  }
+
+  loadConfiguration(configuration: any) {
+    this.config = {
+      ...this.config,
+      totalTickets: configuration.totalTickets ?? this.config.totalTickets,
+      vendorReleaseTime: configuration.vendorReleaseTime ?? this.config.vendorReleaseTime,
+      customerBuyTime: configuration.customerBuyTime ?? this.config.customerBuyTime,
+      maxPoolSize: configuration.maxPoolSize ?? this.config.maxPoolSize
+    };
+
+    this.logs.push(`Configuration ID ${configuration.id} appended to current configuration.`);
+    this.closeLoadConfigurationPopup();
+  }
+
   saveConfiguration() {
-    console.log('Configuration saved:', this.config);
+    if (!this.validateConfiguration()) {
+      this.logs.push('Configuration validation failed. Please fix the errors and try again.');
+      return;
+    }
+
+    this.logs.push('Saving configuration...');
+
     this.apiService.saveConfiguration(this.config).subscribe({
-      next: () => console.log('Configuration saved successfully'),
-      error: (err) => console.error('Error saving configuration:', err)
+      next: () => this.logs.push('Configuration saved successfully.'),
+      error: (err) => {
+        console.error('Error saving configuration:', err);
+        this.logs.push('Error saving configuration. Please try again.');
+      }
     });
+
     this.closeConfiguration();
   }
 }
